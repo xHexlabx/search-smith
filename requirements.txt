@@ -1,0 +1,15 @@
+# requirements.txt
+
+# Core libraries for LangChain
+langchain
+langchain-community
+
+# Libraries we still need for specific components
+sentence-transformers
+pypdf
+chromadb
+
+transformers
+accelerate
+bitsandbytes
+torch
