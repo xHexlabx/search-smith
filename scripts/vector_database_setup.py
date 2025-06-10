@@ -9,7 +9,7 @@ from langchain_community.vectorstores import Chroma
 # กำหนดค่าคงที่
 PDF_DIR = "pdfs"
 DB_PATH = "chroma_db_langchain" # สร้าง DB ใหม่สำหรับ LangChain
-MODEL_NAME = "Qwen/Qwen3-Embedding-0.6B" # หรือ 'intfloat/multilingual-e5-large' สำหรับไทย
+MODEL_NAME = "Qwen/Qwen3-Embedding-8B" # หรือ 'intfloat/multilingual-e5-large' สำหรับไทย
 
 def setup():
     print("🚀 Starting vector database setup...")

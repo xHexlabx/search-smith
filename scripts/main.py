@@ -5,7 +5,7 @@ from langchain_community.vectorstores import Chroma
 
 # กำหนดค่าคงที่ให้ตรงกับตอน setup
 DB_PATH = "chroma_db_langchain"
-MODEL_NAME = "Qwen/Qwen3-Embedding-0.6B" # หรือ 'intfloat/multilingual-e5-large'
+MODEL_NAME = "Qwen/Qwen3-Embedding-8B" # หรือ 'intfloat/multilingual-e5-large'
 
 def main():
     # 1. Load Embeddings Modelz
