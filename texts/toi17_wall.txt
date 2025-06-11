@@ -1,0 +1,140 @@
+[cite\_start]The https://www.google.com/search?q=17th National Computer Olympiad examination, held online at Walailak University, presents Problem https://www.google.com/search?q=1 out of 3. The exam took place on Friday, December https://www.google.com/search?q=10, https://www.google.com/search?q=2564 BE (https://www.google.com/search?q=20https://www.google.com/search?q=2https://www.google.com/search?q=1 CE), from https://www.google.com/search?q=13:00 to https://www.google.com/search?q=16:00. [cite: https://www.google.com/search?q=1]
+
+[cite\_start]The problem is titled "The Wall". [cite: https://www.google.com/search?q=2]
+
+[cite\_start]Due to heavy, incessant rainfall across Nakhon Thammalat (Nielloware City) and exceptionally high tides this year, flash floods are a potential threat. [cite: https://www.google.com/search?q=2] [cite\_start]The heir to the city's ruler has studied the city map to find ways to prevent flooding of homes and agricultural areas. [cite: https://www.google.com/search?q=2] [cite\_start]It was discovered that if water floods into the city from four directions, house walls can still serve as barriers. [cite: https://www.google.com/search?q=2] [cite\_start]However, the ruler is concerned that house walls alone might not be sufficient and has decided to construct additional flood barrier walls. [cite: https://www.google.com/search?q=2] [cite\_start]The RGB Con\&De-struction Group has been called to review the city map and plan the construction of these flood barriers with the heir. [cite: https://www.google.com/search?q=2]
+
+[cite\_start]The city map is a https://www.google.com/search?q=2D grid of R rows and C columns. [cite: https://www.google.com/search?q=2] [cite\_start]Each cell in the grid is identified by coordinates (r, c), where $https://www.google.com/search?q=1 \\le r \\le R$ and $https://www.google.com/search?q=1 \\le c \\le C$. [cite: https://www.google.com/search?q=2] [cite\_start]There are two types of cells: empty spaces, which are agricultural areas, and cells containing the uppercase character 'X', which represent houses. [cite: https://www.google.com/search?q=2] [cite\_start]For example, in Figure https://www.google.com/search?q=1, the cells with houses are (https://www.google.com/search?q=2, https://www.google.com/search?q=2), (https://www.google.com/search?q=2, 4), (3, 3), and (3, 4). [cite: https://www.google.com/search?q=2]
+
+Figure https://www.google.com/search?q=1: Example of a 4x5 grid. [cite\_start]Houses ('X') are at (https://www.google.com/search?q=2,https://www.google.com/search?q=2), (https://www.google.com/search?q=2,4), (3,3), (3,4). [cite: https://www.google.com/search?q=2]
+
+[cite\_start]To build a flood barrier, a "side" of a grid cell is selected. [cite: https://www.google.com/search?q=2] [cite\_start]Each cell in the grid has 4 sides where a wall can be built. [cite: https://www.google.com/search?q=2] [cite\_start]The wall construction must adhere to all the following conditions: [cite: https://www.google.com/search?q=2]
+
+[cite\_start](https://www.google.com/search?q=1) Walls must only be built on a side that is between a floodable empty cell and a house cell. [cite: https://www.google.com/search?q=2] [cite\_start]In this context, a house with at least one side designated as a wall is called a "walled house". [cite: https://www.google.com/search?q=2] [cite\_start]Water flows into the city from all 4 directions around the map. [cite: 3] [cite\_start]Water can flow to any adjacent empty cell. [cite: 3] [cite\_start]Water cannot flow through cells with houses. [cite: 3] [cite\_start]It is possible for some empty cells to be unreachable by water, as shown in examples 'f', 'g', and 'h' in Table https://www.google.com/search?q=1 and in Example 6 of the input. [cite: 3]
+
+[cite\_start](https://www.google.com/search?q=2) All "walled houses" must be connected. [cite: 3] [cite\_start]Two walled houses are considered connected if they share a common side. [cite: 3] [cite\_start]It must be possible to travel between any two walled houses by moving through connected walled houses. [cite: 3]
+
+[cite\_start]For example, considering Figure https://www.google.com/search?q=1, walls can be built according to the conditions as follows: [cite: 3]
+
+  * [cite\_start]Walls built along the purple lines result in walled houses at (https://www.google.com/search?q=2, 4), (3, 3), and (3, 4), with 8 selected wall sides. [cite: 3]
+  * [cite\_start]Walls built along the blue lines result in a walled house at (https://www.google.com/search?q=2, https://www.google.com/search?q=2), with 4 selected wall sides. [cite: 3]
+
+[cite\_start]Table https://www.google.com/search?q=1 provides examples of different wall construction patterns. [cite: 4] [cite\_start]'X' indicates a house, and bold colored lines indicate selected wall sides. [cite: 4]
+
+[cite\_start]Table https://www.google.com/search?q=1: Examples of various wall constructions. [cite: 4, 5, 6]
+
+  * [cite\_start]**Pattern 'a'**: Valid, longest possible purple wall (6 sides). [cite: 4]
+  * [cite\_start]**Pattern 'b'**: Invalid (Condition https://www.google.com/search?q=1) because a wall is not between an empty cell and a house cell. [cite: 4]
+  * [cite\_start]**Pattern 'c'**: Invalid (Condition https://www.google.com/search?q=1) because a wall is not between an empty cell and a house cell. [cite: 5]
+  * [cite\_start]**Pattern 'd'**: Invalid (Condition https://www.google.com/search?q=2) because houses are not connected. [cite: 5]
+  * [cite\_start]**Pattern 'e'**: 3 valid ways to build walls (blue, purple, green lines), each giving 4 sides. [cite: 6]
+  * [cite\_start]**Pattern 'f'**: Invalid (Condition https://www.google.com/search?q=1) because cell (3,3) is an empty cell unreachable by water, preventing a wall between (https://www.google.com/search?q=2,3) and (3,3). [cite: 6]
+  * **Pattern 'g'**: 4 valid ways, each giving 3 sides. [cite\_start]The blue line is an example of a valid wall. [cite: 6]
+  * **Pattern 'h'**: Pink line is valid with 8 sides, but not the maximum. [cite\_start]Max is https://www.google.com/search?q=10. [cite: 6]
+  * **Pattern 'i'**: Purple line is valid and longest possible (https://www.google.com/search?q=1https://www.google.com/search?q=1 sides). [cite\_start]A wall cannot be built on a side of cell (3,https://www.google.com/search?q=2) as it would violate Condition (https://www.google.com/search?q=2) due to a house not sharing a common side. [cite: 6]
+
+**Your Task:**
+[cite\_start]Write an efficient program to find the maximum number of sides selected for wall construction. [cite: 7]
+
+**Input:**
+[cite\_start]The input consists of R + https://www.google.com/search?q=1 lines. [cite: 8]
+
+  * [cite\_start]Line https://www.google.com/search?q=1: Two integers, R and C, separated by a space. [cite: 9]
+      * [cite\_start]R specifies the number of rows in the map grid. [cite: 9]
+      * [cite\_start]C specifies the number of columns in the map grid. [cite: 9]
+      * [cite\_start]Constraints: $3 \\le R, C \\le https://www.google.com/search?q=1,000$. [cite: 9]
+  * [cite\_start]The next R lines: Provide the grid data. [cite: 9]
+      * [cite\_start]Each line represents a row from row https://www.google.com/search?q=1 to row R, respectively. [cite: 9]
+      * [cite\_start]Each line consists of a string of C characters. [cite: 9]
+      * [cite\_start]'X' denotes a cell with a house, and '.' denotes an empty cell. [cite: 9]
+
+[cite\_start]It is guaranteed that cells adjacent to the map's boundary (cells in row https://www.google.com/search?q=1 or R, or column https://www.google.com/search?q=1 or C) will always be empty cells ('.'). [cite: https://www.google.com/search?q=10]
+
+**Output:**
+[cite\_start]One line displaying the maximum number of sides selected for wall construction. [cite: https://www.google.com/search?q=10]
+
+**Examples:**
+**Example https://www.google.com/search?q=1 Input/Output:**
+[cite\_start]Input: [cite: https://www.google.com/search?q=1https://www.google.com/search?q=1]
+4 6
+.X.X..
+.X.XX.
+[cite\_start]Output: [cite: https://www.google.com/search?q=1https://www.google.com/search?q=1]
+8
+
+**Example https://www.google.com/search?q=2 Input/Output:**
+[cite\_start]Input: [cite: https://www.google.com/search?q=1https://www.google.com/search?q=1]
+4 6
+.X.X..
+.X.X.
+[cite\_start]Output: [cite: https://www.google.com/search?q=1https://www.google.com/search?q=1]
+4
+
+**Example 3 Input/Output:**
+[cite\_start]Input: [cite: https://www.google.com/search?q=1https://www.google.com/search?q=1]
+5 5
+.X..
+X.X.
+.X..
+[cite\_start]Output: [cite: https://www.google.com/search?q=1https://www.google.com/search?q=1]
+3
+
+**Example 4 Input/Output:**
+[cite\_start]Input: [cite: https://www.google.com/search?q=1https://www.google.com/search?q=1]
+5 5
+.X..
+XXX.
+..X..
+[cite\_start]Output: [cite: https://www.google.com/search?q=1https://www.google.com/search?q=1]
+https://www.google.com/search?q=1https://www.google.com/search?q=2
+
+**Example 5 Input/Output:**
+[cite\_start]Input: [cite: https://www.google.com/search?q=14]
+7 6
+.X.X.
+.X.X..
+.X..X.
+.X..X.
+.XXXX.
+[cite\_start]Output: [cite: https://www.google.com/search?q=14]
+https://www.google.com/search?q=2https://www.google.com/search?q=2
+
+**Example 6 Input/Output:**
+[cite\_start]Input: [cite: https://www.google.com/search?q=14]
+8 7
+.XXXXX.
+.X...X.
+.X.X.X.
+.X.X.X.
+.X...X.
+.XXXXX.
+[cite\_start]Output: [cite: https://www.google.com/search?q=14]
+https://www.google.com/search?q=2https://www.google.com/search?q=2
+
+**Constraints:**
+
+  * [cite\_start]Input: Standard Input (keyboard) [cite: https://www.google.com/search?q=16]
+  * [cite\_start]Output: Standard Output (screen) [cite: https://www.google.com/search?q=16]
+  * [cite\_start]Maximum processing time: https://www.google.com/search?q=1 second [cite: https://www.google.com/search?q=16]
+  * [cite\_start]Maximum memory usage: 5https://www.google.com/search?q=1https://www.google.com/search?q=2 MB [cite: https://www.google.com/search?q=16]
+  * [cite\_start]Maximum score for the problem: https://www.google.com/search?q=100 points [cite: https://www.google.com/search?q=16]
+  * [cite\_start]Program execution condition: The program must compile successfully. [cite: https://www.google.com/search?q=16]
+
+**Other Requirements:**
+[cite\_start]Contestants must include the following program header: [cite: https://www.google.com/search?q=17]
+
+```cpp
+/*
+TASK: TaskName
+AUTHOR: YourName YourLastName
+CENTER: YourCenter
+*/
+```
+
+**Additional Information about Test Cases:**
+| Test Set Group | Max Score for this group | Conditions                                                                                                                                                                                                                                                                                             |
+| :------------- | :----------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| https://www.google.com/search?q=1              | https://www.google.com/search?q=10                       | $3 \\le R, C \\le 8$ and no house has more than https://www.google.com/search?q=2 adjacent houses. [cite\_start]The contestant's program must pass all test cases in this group to receive points. [cite: https://www.google.com/search?q=19]                                                                                                                                         |
+| https://www.google.com/search?q=2              | https://www.google.com/search?q=20                       | $3 \\le R, C \\le 50$ and no house has more than https://www.google.com/search?q=2 adjacent houses. [cite\_start]The contestant's program must pass all test cases in this group to receive points. [cite: https://www.google.com/search?q=19]                                                                                                                                        |
+| 3              | https://www.google.com/search?q=20                       | $3 \\le R, C \\le 50$ and no house has an adjacent "corner" house (sharing a corner but not a side). (Examples https://www.google.com/search?q=2, 3, and 5 are NOT in this test set). [cite\_start]The contestant's program must pass all test cases in this group to receive points. [cite: https://www.google.com/search?q=19]                                                         |
+| 4              | 50                       | [cite\_start]$3 \\le R, C \\le https://www.google.com/search?q=1,000$. [cite: https://www.google.com/search?q=19]                                                                                                                                                                                                                                                                     |

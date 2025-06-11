@@ -1,0 +1,114 @@
+[cite_start]The 17th National Computer Olympiad examination, held online at Walailak University, presents Problem 3 out of 3. The exam took place on Saturday, December 11, 2564 BE (2021 CE), from 13:00 to 16:00. [cite: 1]
+
+[cite_start]The problem is titled "T-Junction City". [cite: 2]
+
+[cite_start]Three siblings, Daeng (Red), Khiao (Green), and Fah (Blue), have opened a company called RGB Con&De-struction Group. [cite: 2] [cite_start]Their business is to construct roads connecting various nodes in a city. [cite: 2] [cite_start]The specified nodes for road connections can be endpoints, passing points, or junctions to other nodes. [cite: 2] [cite_start]To ensure comprehensive transportation, roads must always connect all specified points. [cite: 2] [cite_start]The income for constructing each road segment depends on its length. [cite: 2]
+
+[cite_start]Whenever the company receives a job, the three siblings meet to divide the road construction tasks into three parts. [cite: 2] [cite_start]Due to equipment and construction limitations, the road segments assigned to each person must remain connected. [cite: 2] [cite_start]To ensure fairness, several possible plans for dividing the construction tasks are considered. [cite: 2] [cite_start]They evaluate each plan by determining the total distance assigned to each person, identifying the person with the minimum total distance, and what that minimum distance is. [cite: 2] [cite_start]A plan is considered most fair if the minimum total distance achieved by any person in that plan is maximized compared to other plans. [cite: 2]
+
+[cite_start]Currently, in preparation for a visit from a guest from the country of "O-mic-ron", the company has received a contract to build roads connecting various nodes in a city called "T-Junction City". [cite: 2] [cite_start]This city requires the construction of N roads to connect N+1 nodes. [cite: 2] [cite_start]Within this limited time and budget, every node can be connected to only 1, 2, or 3 roads. [cite: 2] [cite_start]Travel between any two nodes via roads will always be unique, meaning there is only 1 path. [cite: 2]
+
+[cite_start]Consider the following example of road construction in T-Junction City: $N=8$. [cite: 3] [cite_start]The nodes are represented by circles numbered 0 to 8. [cite: 3] [cite_start]Roads connecting nodes are shown as lines, with numbers next to the lines indicating the length of each road that the company must build. [cite: 3]
+
+[cite_start]Figure 1 illustrates an example of road construction connecting nodes in T-Junction City, where $N=8$. [cite: 3]
+
+[cite_start]Figure 2 shows two example plans for dividing road construction tasks among Daeng, Khiao, and Fah. [cite: 3] [cite_start]These plans satisfy the condition that the road segments assigned to each person must remain connected. [cite: 3] [cite_start]For easier understanding, both plans divide the roads into three groups: (1) red lines, (2) green lines, and (3) blue lines (the blue may appear as dark blue or navy depending on the display). [cite: 3]
+
+[cite_start]From the example, Plan 1 shows that: [cite: 3]
+1.  [cite_start]Daeng is assigned roads totaling $9+8+11+13 = 41$ units. [cite: 3]
+2.  [cite_start]Khiao is assigned roads totaling $50+1 = 51$ units. [cite: 3]
+3.  [cite_start]Fah is assigned roads totaling $12+32 = 44$ units. [cite: 3]
+
+[cite_start]In Plan 1, Daeng is the person with the minimum total distance, which is 41 units. [cite: 3]
+
+[cite_start]For Plan 2: [cite: 3]
+1.  [cite_start]Daeng is assigned roads totaling $9+8+11 = 28$ units. [cite: 3]
+2.  [cite_start]Khiao is assigned roads totaling $50+1 = 51$ units. [cite: 3]
+3.  [cite_start]Fah is assigned roads totaling $13+12+32 = 57$ units. [cite: 3]
+
+[cite_start]In Plan 2, Daeng is still the person with the minimum total distance, which is 28 units. [cite: 3]
+
+[cite_start]Comparing both plans, Plan 1 is considered fairer than Plan 2. [cite: 4] [cite_start]Additionally, when comparing all other possible road division plans, Plan 1 has the highest minimum total distance assigned to a person, making it the fairest plan. [cite: 4]
+
+**Your Task:**
+[cite_start]Write an efficient program to receive road construction data for T-Junction City. [cite: 4] [cite_start]Then, calculate the fairest work allocation plan according to the specified conditions in the problem. [cite: 4] [cite_start]Finally, display the total construction distance of the person assigned the minimum amount of work in that fairest plan. [cite: 4]
+
+**Input:**
+* [cite_start]Line 1: An integer N, representing the total number of road segments to build. [cite: 4]
+    * [cite_start]Constraint: $5 \le N \le 80,000$. [cite: 4]
+* [cite_start]The next N lines: Each line (line $i+1$, for $1 \le i \le N$) provides data for road segment $i$. [cite: 4] [cite_start]Each data set consists of three integers: $U_i$, $V_i$, and $L_i$, separated by a single space. [cite: 4]
+    * [cite_start]$U_i$ and $V_i$ represent the node numbers at the two ends of the road segment. [cite: 4]
+    * [cite_start]$L_i$ represents the length of road segment $i$. [cite: 4]
+    * [cite_start]Constraints: $0 \le U_i, V_i \le N$ and $1 \le L_i \le 20,000$. [cite: 4]
+
+**Output:**
+[cite_start]One line with a single integer, displaying the total road construction distance of the person assigned the minimum amount of work in the fairest plan. [cite: 4]
+
+**Example:**
+**Example 1 Input/Output:**
+Input:
+8
+0 1 9
+1 2 8
+2 3 11
+3 4 50
+4 5 1
+6 3 13
+12 7 6 (Note: This seems to be a typo, it should be 7 6 12 based on the diagram and expected output)
+32 8 6 (Note: This seems to be a typo, it should be 8 6 32 based on the diagram and expected output)
+Output:
+[cite_start]41 [cite: 5]
+
+**Example 2 Input/Output:**
+Input:
+5
+2 10 3
+13 2 4
+5 3 8
+30 0 1
+2 45 1
+Output:
+[cite_start]30 [cite: 5]
+
+**Example 3 Input/Output:**
+Input:
+7
+100 1 2
+99 3 2
+4 102 3
+2 51
+30 2
+1 56
+10 7 6
+Output:
+[cite_start]101 [cite: 5]
+
+[cite_start]Note: The description for Example 1 aligns with the example given in the problem statement. [cite: 7]
+
+**Constraints:**
+* [cite_start]Input: Standard Input (keyboard) [cite: 8]
+* [cite_start]Output: Standard Output (screen) [cite: 8]
+* [cite_start]Maximum processing time: 1 second [cite: 8]
+* [cite_start]Maximum memory usage: 512 MB [cite: 8]
+* [cite_start]Maximum score for the problem: 100 points [cite: 8]
+* [cite_start]Program execution condition: The program must compile successfully. [cite: 8]
+
+**Other Requirements:**
+[cite_start]Contestants must include the following program header: [cite: 9]
+```
+/*
+TASK: TaskName
+AUTHOR: YourName YourLastName
+CENTER: YourCenter
+*/
+```
+
+**Additional Information about Test Cases:**
+| Set No. | Max Score for this set | Condition                                                                                                 |
+| :------ | :--------------------- | :-------------------------------------------------------------------------------------------------------- |
+| 1       | 10                     | $N \le 100$                                                                                               |
+| 2       | 20                     | $N \le 500$                                                                                               |
+| 3       | 20                     | $N \le 10,000$                                                                                            |
+| 4       | 10                     | $N \le 18,000$                                                                                            |
+| 5       | 12                     | $N \le 80,000$, two nodes have only one connecting road, and the remaining nodes have only two connecting roads. |
+| 6       | 28                     | $N \le 80,000$                                                                                            |

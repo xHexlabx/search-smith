@@ -1,0 +1,120 @@
+The 17th National Computer Olympiad examination, held online at Walailak University, presents Problem 3 out of 3. The exam took place on Friday, December 10, 2564 BE (2021 CE), from 13:00 to 16:00.
+
+The problem is titled "The Marauder's Map of Metaverse City".
+
+Metaverse City has hired a company from the RGB Con&De-struction Group to improve its road network map. However, since this city is a metaverse, meaning it's a universe that is altered or newly created according to its name, mapping its routes is challenging. Additionally, travel in Metaverse City is not normal; one can "warp" from certain designated points to another. To efficiently map this city, the company needs highly skilled individuals with both hardware and software abilities, referred to as "Shuangware". However, to qualify for mapping Metaverse City, Shuangware must pass 6 stages: "A EI OU", "Sugar Honeycomb", "Tug-of-War", "Marbles", "Glass Bridge", and "Squid Game". After the selection process, only one person remained: the legendary Shuangware.
+
+The legendary Shuangware's mission to survey routes for mapping begins with defining a grid area of M rows and N columns. Shuangware must travel from a starting point at coordinate (1,1) to an ending point at coordinate (M,N). Travel for surveying is only allowed within the defined area. Movement from one point on the grid to the next can be done in two ways:
+1.  [cite_start]Move to an adjacent point in the North, South, East, or West directions (diagonal movement is not allowed)[cite: 2].
+2.  [cite_start]If the current point is a warp-in point $W_k$ and Shuangware has remaining warp passes, Shuangware can choose to use a pass to warp to a designated warp-out point $O_k$[cite: 2]. [cite_start]Shuangware may choose not to use warping because each use consumes one valuable and limited warp pass[cite: 2].
+
+[cite_start]In each survey, Shuangware is given a limited number of warp passes, P, and is provided with K pairs of warp-in $W_k$ and warp-out $O_k$ coordinates (for $k=1, ..., K$)[cite: 3]. [cite_start]Shuangware must find the shortest path from the starting point to the ending point, but also must preserve as many valuable warp passes as possible[cite: 3].
+
+[cite_start]Note: Warp point coordinates are given as (r, c), meaning row r and column c[cite: 3].
+
+Figure 1 shows an example of a grid of M rows and N columns, with 3 pairs of warp-in and warp-out points: $W_1$ and $O_1$, $W_2$ and $O_2$, and $W_3$ and $O_3$. [cite_start]It also shows a travel path from the starting point (1,1) to the ending point (M,N)[cite: 4].
+
+[cite_start]From the example in Figure 1, where $M=7$ and $N=15$, a travel path from the starting point (1,1) is as follows: move 2 units South, 2 units East, enter warp-in point 1 ($W_1$) at (3,3) to move to warp-out point 1 ($O_1$) at (6,10)[cite: 4]. [cite_start]Then, travel 2 units West, enter warp-in point 2 ($W_2$) at (5,8) to move to warp-out point 2 ($O_2$) at (6,14)[cite: 4]. [cite_start]Continue 1 unit South and 1 unit East to reach the ending point at (7,15)[cite: 4]. [cite_start]The total travel distance is 9 units[cite: 4].
+
+**Your Task:**
+Write an efficient program to find the shortest travel distance from the starting point to the ending point. [cite_start]If there are multiple shortest paths, choose the path that uses the minimum number of warp passes[cite: 4].
+
+**Input:**
+* [cite_start]Line 1: Two integers M and N, separated by a space[cite: 5].
+    * [cite_start]M and N represent the number of rows and columns of the grid area, respectively[cite: 5].
+    * [cite_start]Constraints: $10 \le M, N \le 1,000,000$[cite: 5].
+* [cite_start]Line 2: Two integers K and P, separated by a space[cite: 5].
+    * [cite_start]K represents the number of warp-in and warp-out pairs[cite: 5].
+    * [cite_start]Constraint: $3 \le K \le 20,000$[cite: 5].
+    * [cite_start]P represents the number of warp passes[cite: 5].
+    * [cite_start]Constraint: $1 \le P \le 17$[cite: 5].
+* [cite_start]The next K lines: Each line contains four integers $Wr_i, Wc_i, Or_i, Oc_i$, separated by spaces[cite: 5].
+    * [cite_start]These represent the coordinates $(Wr_i, Wc_i)$ of warp-in point $i$ ($W_i$) and $(Or_i, Oc_i)$ of warp-out point $i$ ($O_i$)[cite: 6].
+    * [cite_start]Constraints: $1 \le Wr_i, Or_i \le M$ and $1 \le Wc_i, Oc_i \le N$[cite: 6].
+    * [cite_start]Constraint: $(Wr_i, Wc_i) \ne (Or_i, Oc_i)$ for $1 \le i \le K$[cite: 6].
+    * [cite_start]No warp-in or warp-out points overlap (i.e., no distinct warp-in points at the same location, or warp-in points coinciding with warp-out points)[cite: 6].
+
+**Output:**
+[cite_start]A single line with two integers, separated by a space[cite: 7]. [cite_start]The first integer is the shortest travel distance, and the second integer is the minimum number of warp passes used for that path[cite: 7].
+
+**Example:**
+**Example 1 Input/Output:**
+Input:
+7 15
+3 3
+3 3 6 10
+5 8 6 14
+2 1 4 9
+Output:
+9 2
+
+**Example 2 Input/Output:**
+Input:
+1000 1000
+7 3
+100 100 300 300
+280 280 400 400
+500 500 375 375
+540 540 700 700
+690 690 600 600
+590 590 890 890
+900 900 950 950
+Output:
+748 3
+
+**Example 3 Input/Output:**
+Input:
+1000 1000
+7 7
+100 100 300 300
+250 250 370 370
+500 500 390 390
+700 700 510 510
+600 600 690 690
+890 890 570 570
+910 910 950 950
+Output:
+578 7
+
+**Submission Notes:**
+This problem requires submitting two solution files for two test groups (Group 1 and Group 2). [cite_start]Points for Test Group 2 will only be awarded if a perfect score is achieved in Test Group 1[cite: 10].
+
+**Constraints (Test Group 1):**
+* [cite_start]Input: Standard Input (keyboard) [cite: 11]
+* [cite_start]Output: Standard Output (screen) [cite: 11]
+* [cite_start]Maximum processing time: 1 second [cite: 11]
+* [cite_start]Maximum memory usage: 256 MB [cite: 11]
+* [cite_start]Maximum score: 68 points [cite: 11]
+* [cite_start]Program execution condition: The program must compile successfully[cite: 11].
+
+**Constraints (Test Group 2):**
+* [cite_start]Input: Standard Input (keyboard) [cite: 13]
+* [cite_start]Output: Standard Output (screen) [cite: 13]
+* [cite_start]Maximum processing time: 12 seconds [cite: 13]
+* [cite_start]Maximum memory usage: 256 MB [cite: 13]
+* [cite_start]Maximum score: 32 points [cite: 13]
+* [cite_start]Program execution condition: The program must compile successfully[cite: 13].
+
+**Other Requirements:**
+Contestants must include the following program header:
+```
+/*
+TASK: TaskName
+AUTHOR: YourName YourLastName
+CENTER: YourCenter
+*/
+```
+
+**Additional Information for Test Group 1:**
+| Set No. | Max Score for this set | Condition                                     |
+| :------ | :--------------------- | :-------------------------------------------- |
+| 1       | 12                     | $K \le 10$; [cite_start]$P \le 5$ [cite: 16]             |
+| 2       | 13                     | $N, M \le 300$; [cite_start]$K \le 1,500$ [cite: 16]     |
+| 3       | 8                      | $P = 1$; [cite_start]$K \le 1,500$ [cite: 16]             |
+| 4       | 14                     | $Wc_i = Oc_i = 5$ for all warp points; [cite_start]$K \le 1,500$ [cite: 16] |
+| 5       | 21                     | $K \le 1,500$; [cite_start]$P \le 17$ [cite: 16]         |
+
+**Additional Information for Test Group 2:**
+| Set No. | Max Score for this set | Condition                                        |
+| :------ | :--------------------- | :----------------------------------------------- |
+| 1       | 32                     | $K \le 20,000$; $P \le 17$ and grouped test data |

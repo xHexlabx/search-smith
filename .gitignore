@@ -1,3 +1,4 @@
-./.ropeproject
-./chroma*
-./pdfs
+.ropeproject/
+chroma*/
+
+pdfs/
