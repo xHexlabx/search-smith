@@ -1,0 +1,99 @@
+The 18th National Computer Olympiad examination at Chiang Mai University includes Problem 1 out of 3, held on Friday, June 3, 2565 BE (2022 CE), from 09:00 to 12:00.
+
+The problem is titled "Chiang Mai Nai Sab" (Shopping).
+
+[cite_start]In response to the "Living with COVID" situation, a full country reopening policy began in June 2565 BE (2022 CE) to welcome both Thai and international tourists[cite: 2]. [cite_start]A group of merchants in Chiang Mai decided to develop a special shopping area called "Chiang Mai Nai Sab Street" ("Nai" in Northern Thai dialect means "to melt")[cite: 2]. [cite_start]The organizers defined this street as being divided into `n` lots, stating that the street has a length of `n`[cite: 2]. [cite_start]They then advertised for shops to sell goods in each lot along the entire length[cite: 2]. [cite_start]When tourists walk on this street, they are irresistibly drawn by Chiang Mai's charm to shop at every store, to the point where they won't stop walking until their money is gone[cite: 2]. [cite_start]To encourage tourists to return for more shopping, some lots may not be shops but instead be "check points" from various merchant groups where tourists can collect points to use as discounts for future purchases[cite: 2]. [cite_start]For the convenience of accommodating many tourists, tourists must shop in one direction only, from the beginning of the street to the end; they cannot walk back[cite: 2]. [cite_start]Each tourist will start with `h` baht and can begin walking at position `x` on the street (lot `x` of the street)[cite: 2]. [cite_start]As they pass any shop, they will be drawn to buy items at a specified value, and their money will decrease[cite: 2]. [cite_start]If they pass a check point, they will accumulate points as specified throughout their walk[cite: 2]. [cite_start]If their money runs out or is insufficient to buy items at a shop, the tourist will immediately exit the street[cite: 2]. [cite_start]To quickly calculate accumulated points, TOI-18 contestants must write an efficient program to calculate the points a tourist accumulates from walking the street, given their initial money and starting position[cite: 3].
+
+**Example of Point Calculation:**
+[cite_start]Consider a Chiang Mai Nai Sab street with a length of 10, as shown in Figure 1[cite: 3].
+
+Figure 1: Example of Chiang Mai Nai Sab Street.
+Positions are numbered 0 to 9. Values at positions: -1, 5, 1, -4, 6, -7, 2, 3, -7, -5.
+
+[cite_start]Here, a negative number at a position indicates a shop, and its absolute value is the price the tourist must pay when passing[cite: 3]. [cite_start]A positive number or zero indicates a check point, and the positive number is the value of points a tourist accumulates when passing[cite: 3]. [cite_start]From Figure 1, positions 0, 3, 5, 8, and 9 are shops, where tourists must pay 1, 4, 7, 7, and 5 baht respectively[cite: 3]. [cite_start]When tourists pass positions 1, 2, 4, 6, and 7, they gain 5, 1, 6, 2, and 3 points respectively[cite: 3].
+
+[cite_start]If a tourist has $h=10$ baht and starts walking the Chiang Mai Nai Sab street at position $x=1$[cite: 3]. [cite_start]When they pass position 3 (a shop), they will have 6 baht left[cite: 3]. [cite_start]When they reach position 5 (the next shop), the item costs 7 baht, and the tourist does not have enough money[cite: 3]. [cite_start]Therefore, the tourist must immediately exit the Chiang Mai Nai Sab street[cite: 3]. [cite_start]In this walk, the tourist will accumulate points from check points at positions 1, 2, and 4, for a total of $5+1+6=12$ points[cite: 4].
+
+**Your Task:**
+[cite_start]Write an efficient program to find the total points a tourist gets from check points, given their initial money and starting position on Chiang Mai Nai Sab Street[cite: 4].
+
+**Input:**
+[cite_start]The input consists of $m+2$ lines[cite: 5]:
+* [cite_start]Line 1: Two integers `n` and `m`, separated by a space[cite: 5].
+    * [cite_start]`n` represents the length of Chiang Mai Nai Sab Street[cite: 5].
+        * [cite_start]Constraint: $1 \le n \le 500,000$[cite: 5].
+    * [cite_start]`m` represents the number of tourists for whom to calculate points[cite: 5].
+        * [cite_start]Constraint: $1 \le m \le 500,000$[cite: 5].
+* [cite_start]Line 2: `n` integers $a_0, ..., a_{n-1}$, separated by spaces[cite: 5].
+    * [cite_start]This represents the data for Chiang Mai Nai Sab Street[cite: 5].
+    * [cite_start]Constraint: $-1,000 \le a_i \le 1,000$ for $i=0, ..., n-1$[cite: 5].
+* [cite_start]Lines 3 to $m+2$: Each line contains two integers $x_j$ and $h_j$, separated by a space[cite: 5].
+    * [cite_start]$x_j$ represents the starting position on Chiang Mai Nai Sab Street for tourist $j$[cite: 5].
+    * [cite_start]Constraint: $0 \le x_j \le n-1$[cite: 5].
+    * [cite_start]$h_j$ represents the initial money of tourist $j$[cite: 5].
+    * [cite_start]Constraint: $1 \le h_j < 2^{31}$ for $j=1, ..., m$[cite: 5].
+
+**Output:**
+[cite_start]The output consists of `m` lines[cite: 5]:
+* [cite_start]Line `j`: The accumulated points for tourist `j` (for $j=1, ..., m$)[cite: 5].
+
+**Example 1 Input/Output:**
+Input:
+8 6
+-1 0 -3 5 6 -2 0 3 4 0
+0 3
+0 13
+0 14
+2 1
+2 500000000
+6 1
+Output:
+0
+0
+11
+11
+18
+4
+
+**Example 2 Input/Output:**
+Input:
+6 6
+-1 -1 -1 -1 -1 -1
+3 1
+5 1
+0 1
+2 1
+4 1
+1 500000000
+Output:
+0
+0
+0
+0
+0
+0
+
+**Constraints:**
+* [cite_start]Input: Standard Input (keyboard) [cite: 10]
+* [cite_start]Output: Standard Output (screen) [cite: 10]
+* [cite_start]Maximum processing time: 1 second [cite: 10]
+* [cite_start]Maximum memory usage: 1024MB [cite: 10]
+* [cite_start]Maximum score for the problem: 100 points [cite: 10]
+* [cite_start]Program execution condition: The program must compile successfully[cite: 10].
+
+**Additional Information about Test Cases:**
+| Group Test Case | Maximum Score for this group | Condition |
+|---|---|---|
+| 1 | 13 | [cite_start]$n \le 1,000$ and $m \le 1,000$ [cite: 13] |
+| 2 | 8 | [cite_start]No $a_i$ is negative [cite: 13] |
+| 3 | 21 | [cite_start]$h_j = 1$ [cite: 13] |
+| 4 | 17 | [cite_start]$x_j = 0$ [cite: 13] |
+| 5 | 41 | [cite_start]No other conditions [cite: 13] |
+
+**Programming Recommendations:**
+If using `cin`/`cout`, it is recommended to add the following two lines:
+```cpp
+std::ios_base::sync_with_stdio(false);
+std::cin.tie(NULL);
+```
+[cite_start][cite: 14]

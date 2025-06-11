@@ -1,0 +1,111 @@
+The 18th National Computer Olympiad examination at Chiang Mai University includes Problem 1 out of 3, held on Thursday, June 2, 2565 BE (2022 CE), from 09:00 to 12:00.
+
+The problem is titled "Mountain".
+
+"Doi" and "Mon" are Northern Thai dialect words, where "Doi" means mountain and "Mon" means a low mountain or hilltop. Chiang Mai province has many relaxing and scenic "Mon" attractions, such as Mon Jam, Mon Ing Dao, Mon Tawan, and Mon View Ngam. These "Mon" areas attract tourists to Chiang Mai periodically. To truly experience the natural atmosphere, enjoy the cool breeze, and witness beautiful sea mists, tourists need to trek to the summit of a "Mon" themselves. To help tourists travel safely, officials have designated several rest stops where tourists can stop for water or food before continuing to their desired destination. For convenient coordination and emergency assistance, officials stipulate that travel between rest stops must only be along latitude lines (x-axis) or longitude lines (y-axis). Coordinates and distances are given as integers, and the distance between rest stops is measured as the sum of distances along the x and y axes (Manhattan distance, no diagonal travel). Furthermore, it has been observed that each tourist has a different level of stamina, allowing them to travel a limited distance before needing to rest. Therefore, the travel distance between rest stops for each tourist must not exceed that tourist's limit.
+
+There are M tourists. Each tourist wants to reach their destination as quickly as possible, meaning they want to stop at the fewest possible rest stops provided by the officials. However, they must also take care of their health, so tourist $k$ can travel no more than $s_k$ units ($k=1,...,M$) before each stop, and then continue until they reach the "Mon" summit. The officials need to collect data on the number of stops each tourist makes to prepare water and food for all tourists at every rest stop, including the summit, which is also counted as a rest stop.
+
+For example, if the starting point is at (0,1), rest stops are at (2,2), (3,6), and (6,6), and the "Mon" summit is at (9,10). (Assume the total number of rest stops, including the start and summit, is $n=5$). This information is shown in Figure 1, where S represents the starting point, B represents a rest stop, and T represents the "Mon" summit (which is also a rest stop).
+
+If there are $m=2$ tourists, where the first tourist has a maximum travel limit of 10 units ($s_1=10$) and the second tourist has a maximum travel limit of 15 units ($s_2=15$):
+To minimize stops, the first tourist must stop at rest stop (3,6) before traveling to the summit (9,10). (Officials need to prepare 2 sets of food and water for this tourist). The second tourist can choose to stop at either (3,6) or (6,6) before traveling to the summit. (Officials need to prepare another 2 sets of food and water for this tourist). Therefore, officials must prepare a total of $2+2=4$ sets of water and food.
+
+However, if the second tourist has a maximum travel limit of 30 units ($s_2=30$), the second tourist can travel from the starting point to the summit without any intermediate stops. This reduces the number of food and water sets officials need to prepare to $2+1=3$.
+
+**Your Task:**
+Write an efficient program to determine the minimum total number of water and food sets officials need to prepare, given the starting coordinates, the "Mon" summit coordinates, the coordinates of various rest stops, the number of tourists, and the maximum distance each tourist can travel on foot before stopping.
+
+**Input:**
+The input consists of $M+N+1$ lines:
+* Line 1: Two integers $N$ and $M$, separated by a space.
+    * $N$ represents the total number of rest stops (including the starting point and the "Mon" summit).
+    * Constraint: $5 \le N \le 500$.
+    * $M$ represents the number of tourists.
+    * Constraint: $1 \le M \le 200,000$.
+* Lines $i+1$ (for $i=1$ to $N$): Two integers $x_i$ and $y_i$, separated by a space.
+    * These represent the coordinates $(x_i, y_i)$ of rest stop $i$.
+    * $(x_1, y_1)$ represents the starting point.
+    * $(x_N, y_N)$ represents the "Mon" summit.
+    * Constraint: $0 \le x_i, y_i \le 2^{60}$.
+* Lines $k+N+1$ (for $k=1$ to $M$): Each line contains a single integer $s_k$.
+    * $s_k$ represents the maximum distance tourist $k$ can walk without stopping.
+    * Constraint: $1 \le s_k \le 2^{60}$.
+
+**Output:**
+The output consists of 1 line:
+* Line 1: The minimum total number of water and food sets the officials need to prepare for all tourists.
+
+**Example 1 Input/Output:**
+Input:
+5 2
+0 1
+2 2
+3 6
+6 6
+9 10
+10
+15
+Output:
+4
+
+**Example 2 Input/Output:**
+Input:
+5 2
+0 1
+2 2
+3 6
+6 6
+9 10
+10
+30
+Output:
+3
+
+**Example 3 Input/Output:**
+Input:
+5 2
+0 0
+2 0
+7 0
+4 0
+10 0
+10
+3
+Output:
+5
+
+**Constraints:**
+* Input: Standard Input (keyboard)
+* Output: Standard Output (screen)
+* Maximum processing time: 1 second
+* Maximum memory usage: 1024MB
+* Maximum score for the problem: 100 points
+* Program execution condition: The program must compile successfully.
+
+**Other Requirements:**
+Contestants must include the following program header:
+```
+/*
+TASK: TaskName
+AUTHOR: YourName YourLastName
+CENTER: YourCenter
+*/
+```
+
+**Additional Information about Test Cases:**
+| Group Test Case | Max Score for this group | Condition |
+|---|---|---|
+| 1 | 12 | $N \le 10$, $M \le 12$, and $0 \le x, y \le 1,000$ |
+| 2 | 16 | $N \le 250$ and $M \le 400$ |
+| 3 | 7 | $N \le 100$ and $y_i = 0$ |
+| 4 | 14 | $N \le 100$ and $s_k$ is sorted in ascending order |
+| 5 | 9 | $N \le 200$ and $0 \le x, y \le 10^8$ |
+| 6 | 42 | No other conditions |
+
+**Programming Recommendations:**
+If using `cin`/`cout`, it is recommended to add the following two lines:
+```cpp
+std::ios_base::sync_with_stdio(false);
+std::cin.tie(NULL);
+```
