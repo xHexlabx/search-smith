@@ -1,18 +1,22 @@
-# requirements.txt
+# Gemini API for File Parsing
+# ใช้สำหรับ documents_handler.py เวอร์ชันล่าสุดที่ใช้ File API
+google-generativeai
 
-#libraries from LLAMA Index
-llama-cloud-services
-
-# Core libraries for LangChain
+# Core libraries for LangChain and Vector DB
+# ใช้สำหรับโหลดเอกสาร, แบ่งข้อความ, และจัดการ Vector Store
 langchain
 langchain-community
-
-# Libraries we still need for specific components
-sentence-transformers
-pypdf
 chromadb
 
+# For Hugging Face Embeddings
+# ใช้สำหรับสร้าง Embeddings ใน vector_database_setup.py และ main.py
+sentence-transformers
+torch
 transformers
 accelerate
 bitsandbytes
-torch
+
+# Utilities
+# ไลบรารีเสริมที่ใช้ในสคริปต์ต่างๆ
+python-dotenv
+tqdm
