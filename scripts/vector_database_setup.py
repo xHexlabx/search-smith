@@ -13,7 +13,7 @@ from search_smith.vector_store_handler import create_huggingface_embeddings, bui
 
 # 1. กำหนด Path หลักของโปรเจกต์
 BASE_DIR = Path(__file__).resolve().parent.parent
-TEXTS_DIR = BASE_DIR / "databases" / "texts"
+TEXTS_DIR = BASE_DIR / "databases" / "solutions"
 VECTOR_STORE_DIR = BASE_DIR / "databases" / "vector_store"
 
 # 2. กำหนดค่าสำหรับการแบ่งข้อความ
