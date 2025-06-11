@@ -1,0 +1,1 @@
+from .documents_handler import documents_setup

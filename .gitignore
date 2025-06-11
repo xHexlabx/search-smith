@@ -2,3 +2,5 @@
 chroma*/
 
 pdfs/
+.env
+config.ini

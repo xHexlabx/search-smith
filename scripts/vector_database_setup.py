@@ -1,114 +1,53 @@
 # scripts/vector_database_setup.py
 
-import os
-import re
-from tqdm import tqdm
-from langchain_community.document_loaders import TextLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_community.vectorstores import Chroma
+import time
+from pathlib import Path
 
-# --- Configuration ---
-TEXT_DIR = "texts"  # Directory containing the text files
-DB_PATH = "chroma_db_langchain"
-MODEL_NAME = "Qwen/Qwen3-Embedding-4B" # Or "intfloat/multilingual-e5-large"
+# --- นำเข้าฟังก์ชันจากโมดูลต่างๆ ---
+# --- Import functions from various modules ---
+from search_smith.data_loader import load_markdown_documents
+from search_smith.text_splitter import split_docs_into_chunks
+from search_smith.vector_store_handler import create_huggingface_embeddings, build_and_persist_vector_store
 
-# --- Chunking Strategy ---
-# Adjust chunk size and overlap based on the nature of your text documents.
-CHUNK_SIZE = 2000
-CHUNK_OVERLAP = 500
+# --- การตั้งค่าหลัก (Main Configuration) ---
 
-def clean_text(text: str) -> str:
-    """
-    Helper function to clean extracted text.
-    - Removes excessive newlines and whitespace.
-    - Fixes common text extraction artifacts.
-    """
-    # Replace multiple newlines with a single one
-    text = re.sub(r'\n\s*\n', '\n', text)
-    # Replace multiple spaces with a single space
-    text = re.sub(r' +', ' ', text)
-    # Remove leading/trailing whitespace from each line
-    text = "\n".join([line.strip() for line in text.split('\n')])
-    return text.strip()
+# 1. กำหนด Path หลักของโปรเจกต์
+BASE_DIR = Path(__file__).resolve().parent.parent
+TEXTS_DIR = BASE_DIR / "databases" / "texts"
+VECTOR_STORE_DIR = BASE_DIR / "databases" / "vector_store"
 
-def load_and_process_texts(directory_path: str) -> list:
+# 2. กำหนดค่าสำหรับการแบ่งข้อความ
+CHUNK_SIZE = 1000
+CHUNK_OVERLAP = 200
+
+# 3. กำหนดชื่อโมเดล Embeddings
+EMBED_MODEL_NAME = "Qwen/Qwen3-Embedding-8B"
+
+def main():
     """
-    Loads text files from a directory, cleans their content, and enhances metadata.
-    - Iterates through files, handling potential errors.
-    - Skips files that cannot be read.
+    ฟังก์ชันหลักสำหรับรันกระบวนการสร้าง Vector Database โดยเรียกใช้โมดูลต่างๆ
+    Main function to run the Vector Database creation process by calling various modules.
     """
-    all_docs = []
-    # Find all files ending with .txt in the specified directory
-    text_files = [f for f in os.listdir(directory_path) if f.lower().endswith(".txt")]
+    start_time = time.time()
     
-    if not text_files:
-        print(f"⚠️ No text files found in '{directory_path}'.")
-        return []
-
-    print(f"📂 Found {len(text_files)} text files. Processing each file...")
-    
-    for filename in tqdm(text_files, desc="Processing Text Files"):
-        file_path = os.path.join(directory_path, filename)
-        try:
-            # Load a single text file
-            # Specify UTF-8 encoding for broad compatibility
-            loader = TextLoader(file_path, encoding='utf-8')
-            documents = loader.load()
-            
-            # Process the loaded document (TextLoader loads one file as one document)
-            for doc in documents:
-                # Clean the page content
-                doc.page_content = clean_text(doc.page_content)
-                
-                # Enhance metadata
-                # Use the filename as the primary source identifier
-                doc.metadata['source'] = filename
-                
-            all_docs.extend(documents)
-        except Exception as e:
-            # If a file is unreadable, skip it and report the error
-            print(f"\n❌ Error processing file '{filename}': {e}. Skipping this file.")
-            
-    return all_docs
-
-
-def setup():
-    """
-    Main function to set up the vector database.
-    """
-    print("🚀 Starting vector database setup...")
-
-    # 1. Load, Clean, and Process Documents
-    documents = load_and_process_texts(TEXT_DIR)
-    
+    # Step 1: โหลดเอกสาร .md จากโมดูล data_loader
+    documents = load_markdown_documents(TEXTS_DIR)
     if not documents:
-        print("No documents were successfully loaded. Exiting.")
+        print("No documents to process. Exiting.")
         return
+        
+    # Step 2: แบ่งเอกสารเป็น Chunks จากโมดูล text_splitter
+    docs_splitted = split_docs_into_chunks(documents, CHUNK_SIZE, CHUNK_OVERLAP)
+    
+    # Step 3: สร้าง Embeddings จากโมดูล vector_store_handler
+    embeddings = create_huggingface_embeddings(EMBED_MODEL_NAME)
+    
+    # Step 4: สร้างและบันทึก Vector Database จากโมดูล vector_store_handler
+    build_and_persist_vector_store(docs_splitted, embeddings, VECTOR_STORE_DIR)
+    
+    end_time = time.time()
+    print(f"Total execution time: {end_time - start_time:.2f} seconds.")
 
-    print(f"\n✅ Loaded and processed {len(documents)} documents in total.")
-
-    # 2. Split Documents into Chunks
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=CHUNK_SIZE,
-        chunk_overlap=CHUNK_OVERLAP
-    )
-    chunks = text_splitter.split_documents(documents)
-    print(f"📄 Split documents into {len(chunks)} chunks.")
-
-    # 3. Create Embeddings Model
-    print(f"🤖 Loading embedding model: {MODEL_NAME}")
-    embeddings = HuggingFaceEmbeddings(model_name=MODEL_NAME)
-
-    # 4. Create and Persist Vector Store (ChromaDB)
-    print(f"📦 Creating and persisting vector store at: {DB_PATH}")
-    Chroma.from_documents(
-        documents=chunks,
-        embedding=embeddings,
-        persist_directory=DB_PATH
-    )
-
-    print("\n✅ Vector database setup complete!")
 
 if __name__ == "__main__":
-    setup()
+    main()

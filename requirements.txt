@@ -1,5 +1,8 @@
 # requirements.txt
 
+#libraries from LLAMA Index
+llama-cloud-services
+
 # Core libraries for LangChain
 langchain
 langchain-community
