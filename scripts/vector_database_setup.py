@@ -5,7 +5,7 @@ from pathlib import Path
 
 # --- นำเข้าฟังก์ชันจากโมดูลต่างๆ ---
 # --- Import functions from various modules ---
-from search_smith.data_loader import load_markdown_documents
+from search_smith.data_loader import load_text_documents
 from search_smith.text_splitter import split_docs_into_chunks
 from search_smith.vector_store_handler import create_huggingface_embeddings, build_and_persist_vector_store
 
@@ -23,19 +23,22 @@ CHUNK_OVERLAP = 200
 # 3. กำหนดชื่อโมเดล Embeddings
 EMBED_MODEL_NAME = "Qwen/Qwen3-Embedding-8B"
 
+
 def main():
     """
     ฟังก์ชันหลักสำหรับรันกระบวนการสร้าง Vector Database โดยเรียกใช้โมดูลต่างๆ
-    Main function to run the Vector Database creation process by calling various modules.
+    Main function to run the Vector Database creation process
+    by calling various modules.
     """
     start_time = time.time()
     
     # Step 1: โหลดเอกสาร .md จากโมดูล data_loader
-    documents = load_markdown_documents(TEXTS_DIR)
+    documents = load_text_documents(TEXTS_DIR)
     if not documents:
         print("No documents to process. Exiting.")
         return
-        
+    
+    
     # Step 2: แบ่งเอกสารเป็น Chunks จากโมดูล text_splitter
     docs_splitted = split_docs_into_chunks(documents, CHUNK_SIZE, CHUNK_OVERLAP)
     

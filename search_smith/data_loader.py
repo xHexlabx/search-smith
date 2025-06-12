@@ -4,13 +4,14 @@ from typing import List
 from langchain_core.documents import Document
 from langchain_community.document_loaders import DirectoryLoader
 
-def load_markdown_documents(directory: Path) -> List[Document]:
+
+def load_text_documents(directory: Path) -> List[Document]:
     """
-    โหลดเอกสาร Markdown ทั้งหมดจากโฟลเดอร์ที่กำหนด
-    Loads all Markdown documents from a specified directory.
-    
+    โหลดเอกสาร Text ทั้งหมดจากโฟลเดอร์ที่กำหนด
+    Loads all Text documents from a specified directory.
+
     Args:
-        directory (Path): The path to the directory containing .md files.
+        directory (Path): The path to the directory containing .txt files.
 
     Returns:
         List[Document]: A list of loaded documents.
@@ -19,8 +20,8 @@ def load_markdown_documents(directory: Path) -> List[Document]:
     if not directory.exists():
         print(f"Directory not found: {directory}")
         return []
-        
-    loader = DirectoryLoader(str(directory), glob="**/*.md", show_progress=True)
+
+    loader = DirectoryLoader(str(directory), glob="**/*.txt", show_progress=True)
     documents = loader.load()
     print(f"Loaded {len(documents)} documents.")
     return documents
