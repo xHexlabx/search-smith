@@ -14,7 +14,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 PROMPT_FILE_PATH = "prompts/tagger.txt"
 DOCUMENTS_DIR = "databases/texts"
 # IMPORTANT: This path should point to your local model directory
-MODEL_PATH = "Qwen/Qwen3-32B" 
+MODEL_PATH = "Qwen/Qwen3-8B" 
 
 def documents_setup():
     """
