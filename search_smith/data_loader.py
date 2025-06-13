@@ -21,7 +21,12 @@ def load_text_documents(directory: Path) -> List[Document]:
         print(f"Directory not found: {directory}")
         return []
 
-    loader = DirectoryLoader(str(directory), glob="**/*.txt", show_progress=True)
+    loader = DirectoryLoader(
+        str(directory),
+        glob="**/*.txt",
+        show_progress=True
+    )
+
     documents = loader.load()
     print(f"Loaded {len(documents)} documents.")
     return documents

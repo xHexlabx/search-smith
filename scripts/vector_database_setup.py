@@ -7,7 +7,8 @@ from pathlib import Path
 # --- Import functions from various modules ---
 from search_smith.data_loader import load_text_documents
 from search_smith.text_splitter import split_docs_into_chunks
-from search_smith.vector_store_handler import create_huggingface_embeddings, build_and_persist_vector_store
+from search_smith.vector_store_handler import create_huggingface_embeddings
+from search_smith.vector_store_handler import build_and_persist_vector_store
 
 # --- การตั้งค่าหลัก (Main Configuration) ---
 
@@ -31,23 +32,26 @@ def main():
     by calling various modules.
     """
     start_time = time.time()
-    
+
     # Step 1: โหลดเอกสาร .md จากโมดูล data_loader
     documents = load_text_documents(TEXTS_DIR)
     if not documents:
         print("No documents to process. Exiting.")
         return
-    
-    
+
     # Step 2: แบ่งเอกสารเป็น Chunks จากโมดูล text_splitter
-    docs_splitted = split_docs_into_chunks(documents, CHUNK_SIZE, CHUNK_OVERLAP)
-    
+    docs_splitted = split_docs_into_chunks(
+        documents,
+        CHUNK_SIZE,
+        CHUNK_OVERLAP
+    )
+
     # Step 3: สร้าง Embeddings จากโมดูล vector_store_handler
     embeddings = create_huggingface_embeddings(EMBED_MODEL_NAME)
-    
+
     # Step 4: สร้างและบันทึก Vector Database จากโมดูล vector_store_handler
     build_and_persist_vector_store(docs_splitted, embeddings, VECTOR_STORE_DIR)
-    
+
     end_time = time.time()
     print(f"Total execution time: {end_time - start_time:.2f} seconds.")
 

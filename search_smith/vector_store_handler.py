@@ -38,7 +38,7 @@ def build_and_persist_vector_store(docs: List[Document], embeddings: HuggingFace
     )
     
     print("-" * 50)
-    print(f"Vector database created successfully!")
+    print("Vector database created successfully!")
     print(f"Number of vectors in DB: {vector_db._collection.count()}")
     print(f"Database saved at: {store_path}")
     print("-" * 50)

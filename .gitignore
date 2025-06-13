@@ -4,3 +4,9 @@ chroma*/
 pdfs/
 .env
 config.ini
+
+databases/problems/
+
+instructions/
+
+models/
