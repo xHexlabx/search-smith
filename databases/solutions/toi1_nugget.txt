@@ -1,0 +1,60 @@
+#include <iostream>
+#include <vector>
+#include <numeric> // For std::iota if needed, not strictly for this code
+
+int main() {
+    // Optimize C++ standard streams for competitive programming.
+    // This unties cin from cout and prevents synchronization with C's stdio.
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+
+    int n;
+    std::cin >> n; // Read the upper limit N
+
+    // dp[i] will be true if 'i' can be formed as a sum of 6, 9, or 20.
+    // The size 110 is chosen as a common upper bound, assuming N will not exceed this.
+    // It should ideally be n + max_denomination to prevent out-of-bounds access
+    // when adding the denominations. For safety, a slightly larger size than n
+    // is used here, or dynamic resizing could be considered for very large N.
+    std::vector<bool> dp(110, false);
+
+    // Initialize base cases: these exact values can be formed.
+    dp[6] = true;
+    dp[9] = true;
+    dp[20] = true;
+
+    // Define the denominations available.
+    // These are the values that can be added to existing sums.
+    int denominations[] = {6, 9, 20};
+    int num_denominations = sizeof(denominations) / sizeof(denominations[0]);
+
+    // Handle edge case: if N is too small, no valid sums can be formed.
+    // The smallest possible sum is 6.
+    if (n < 6) {
+        std::cout << "no\n";
+        return 0; // Exit since no numbers can be printed.
+    }
+
+    // Dynamic programming loop:
+    // Iterate from 0 up to N to determine which sums are possible.
+    for (int i = 0; i <= n; ++i) {
+        // If 'i' can be formed (i.e., dp[i] is true), then:
+        if (dp[i]) {
+            // Print 'i' as it is a valid sum.
+            std::cout << i << '\n';
+
+            // From 'i', we can form new sums by adding each denomination.
+            // Mark these new sums as possible.
+            for (int j = 0; j < num_denominations; ++j) {
+                // Ensure we don't go out of bounds of the dp array.
+                // The size of dp array is 110, so any i + denomination[j]
+                // that exceeds 109 should not be accessed.
+                if (i + denominations[j] < dp.size()) {
+                    dp[i + denominations[j]] = true;
+                }
+            }
+        }
+    }
+
+    return 0; // Indicate successful execution
+}

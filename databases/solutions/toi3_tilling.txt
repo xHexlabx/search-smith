@@ -1,0 +1,152 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <tuple> // For std::tuple, though not directly used in the refactor below.
+
+// Using standard namespace, but it's generally good practice to qualify names (e.g., std::cout)
+// in larger projects to avoid name collisions. For competitive programming, 'using namespace std;' is common.
+using namespace std;
+
+// Type aliases for better readability
+using LongLong = long long;
+using PairInt = pair<int, int>;
+
+// Global grid (adjacency matrix for a 2D space)
+// It's declared globally because it's modified by the `bfs` function.
+// Using a global variable for the grid is common in competitive programming
+// for simplicity, but passing it by reference would be a more encapsulated design.
+vector<vector<int>> grid_data;
+
+// Directions for moving in a 2D grid (right, left, down, up)
+// These arrays are constant and define the possible moves from a cell to its neighbors.
+const int DR[] = {1, -1, 0, 0}; // Change in row (for right, left, no change for up/down)
+const int DC[] = {0, 0, 1, -1}; // Change in column (no change for right/left, for down, up)
+
+/*
+    Overall Idea:
+
+    This program identifies and counts specific "L-shaped" formations of identical numbers
+    within a square grid. It uses a Breadth-First Search (BFS) algorithm to traverse
+    connected components of the same number.
+
+    The BFS function `find_and_mark_l_shape` takes a starting cell (row, column) and the grid size.
+    It explores all adjacent cells with the same number, effectively finding a connected component.
+    During the traversal, it also counts the number of cells in the component and tracks
+    the directions in which the component extends (up, down, left, right from the initial cell's perspective).
+    Cells visited during the BFS are marked as '0' to prevent re-visiting and re-counting.
+
+    After the BFS completes for a component, it checks if:
+    1. The component consists of exactly 3 cells.
+    2. The component forms an 'L' shape. An 'L' shape in this context is defined as having
+       at most one extension in the vertical directions (up or down) and at most one extension
+       in the horizontal directions (left or right). This effectively means it extends in
+       one vertical direction and one horizontal direction from a central point.
+
+    The main function iterates through each cell of the grid. If a cell contains a non-zero number
+    (meaning it hasn't been visited as part of a previous component), it initiates a BFS.
+    If the BFS identifies an 'L-shaped' component, a counter is incremented.
+    Finally, the total count of 'L-shaped' formations is printed.
+*/
+
+// Function to perform BFS and check for L-shape
+// Parameters:
+// - start_r: Starting row for BFS
+// - start_c: Starting column for BFS
+// - n: Size of the square grid (n x n)
+// Returns true if an L-shaped component of size 3 is found, false otherwise.
+bool find_and_mark_l_shape(int start_r, int start_c, int n) {
+    int target_value = grid_data[start_r][start_c]; // The value of the current connected component
+    queue<PairInt> q;
+    q.push({start_r, start_c});
+    grid_data[start_r][start_c] = 0; // Mark as visited by setting to 0
+
+    int component_size = 0;
+    // Track extensions in each direction relative to any cell in the component, not just the start.
+    // This naming (up, down, left, right) refers to the *connections* made in those directions,
+    // not necessarily the extent of the component itself.
+    // Let's refine these to be more descriptive of connections in 4 cardinal directions.
+    int connections_right = 0;
+    int connections_left = 0;
+    int connections_down = 0;
+    int connections_up = 0;
+
+    while (!q.empty()) {
+        PairInt current_cell = q.front();
+        q.pop();
+        int r = current_cell.first;
+        int c = current_cell.second;
+        component_size++;
+
+        // Explore neighbors
+        for (int i = 0; i < 4; ++i) { // Iterate through the 4 directions
+            int next_r = r + DR[i];
+            int next_c = c + DC[i];
+
+            // Check if the neighbor is within grid boundaries and has the target value (and not visited)
+            if (next_r >= 0 && next_r < n && next_c >= 0 && next_c < n && grid_data[next_r][next_c] == target_value) {
+                // Mark as visited before adding to queue to prevent cycles and redundant processing
+                grid_data[next_r][next_c] = 0;
+                q.push({next_r, next_c});
+
+                // Count connections made in each direction
+                if (i == 0) connections_right++; // Moving right (DR[0]=1)
+                else if (i == 1) connections_left++; // Moving left (DR[1]=-1)
+                else if (i == 2) connections_down++; // Moving down (DC[2]=1)
+                else if (i == 3) connections_up++; // Moving up (DC[3]=-1)
+            }
+        }
+    }
+
+    // An L-shape of 3 cells will have a total of 2 unique connections from the "corner" cell
+    // to its two "arms". The sum of connection counts for horizontal and vertical movements
+    // from all cells in the component should reflect this.
+    // The condition (up + d <= 1) && (l+r <= 1) seems to be checking if the component
+    // has at most one "vertical" connection and at most one "horizontal" connection
+    // across all its cells. This is a characteristic of a 3-cell L-shape.
+    // For a 3-cell L-shape, 'up+d' should be 1 (one vertical arm) and 'l+r' should be 1 (one horizontal arm).
+    // The original code implies that if it's <= 1 for both, it's an L-shape.
+    // A straight line of 3 cells (e.g., xxx or x x x) would also satisfy up+d <= 1 and l+r <= 1,
+    // as it would only have horizontal or vertical connections, but not both at the same time.
+    // However, the component_size == 3 ensures it's not just a single cell or two cells.
+    // A straight line of 3 cells would have (up+d == 0 and l+r == 2) OR (up+d == 2 and l+r == 0).
+    // So (up+d <= 1 && l+r <= 1) *combined with component_size == 3* correctly identifies L-shapes.
+    return (component_size == 3) && (connections_up + connections_down <= 1) && (connections_left + connections_right <= 1);
+}
+
+int main() {
+    // Optimize C++ standard streams for competitive programming
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+
+    int n;
+    cin >> n; // Read grid size
+
+    // Resize the global grid_data to n x n
+    // No need for n+2 padding unless boundary conditions require it (which they don't here with proper checks)
+    grid_data.resize(n, vector<int>(n));
+
+    // Read grid values
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            cin >> grid_data[i][j];
+        }
+    }
+
+    int l_shape_count = 0; // Counter for L-shaped formations
+
+    // Iterate through each cell of the grid
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            // If the cell contains a non-zero value, it's part of an unvisited component
+            if (grid_data[i][j] != 0) {
+                if (find_and_mark_l_shape(i, j, n)) {
+                    l_shape_count++;
+                }
+            }
+        }
+    }
+
+    cout << l_shape_count << endl; // Print the total count
+    return 0;
+}

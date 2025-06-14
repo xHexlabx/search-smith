@@ -1,0 +1,64 @@
+#include <iostream>   // Required for input/output operations (cin, cout)
+#include <vector>     // Required for std::vector
+#include <algorithm>  // Required for std::max
+#include <iomanip>    // Required for std::fixed and std::setprecision if coutf was used
+
+// The overall idea of this code is to solve the "Skyline Problem" or a simplified version of it.
+// It processes a series of rectangular buildings defined by their left edge, height, and right edge.
+// For each horizontal position, it determines the maximum height among all buildings covering that position.
+// Finally, it outputs the "critical points" of the skyline: the x-coordinates where the maximum height changes,
+// along with the new height at that x-coordinate.
+
+int main() {
+    // Optimize C++ standard streams for competitive programming (faster I/O).
+    // This replaces the `macos` macro.
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+    // std::cout.tie(NULL); // This line is generally not needed unless output is very heavy and interleaved with input
+
+    // Define a constant for the maximum possible x-coordinate.
+    // This is used for the size of the array that stores maximum heights.
+    // Using a named constant is more readable than a raw number.
+    const int MAX_COORD = 256;
+
+    // Use std::vector instead of a raw array for better memory management and safety.
+    // Initialize all heights to 0.
+    std::vector<int> max_height_at_x(MAX_COORD, 0);
+
+    int num_buildings; // Number of buildings
+    std::cin >> num_buildings;
+
+    // Loop to read and process each building's dimensions.
+    // Replaces `forr(i,0,n)`.
+    for (int i = 0; i < num_buildings; ++i) {
+        int left_edge, height, right_edge; // Building's left edge, height, and right edge
+        std::cin >> left_edge >> height >> right_edge;
+
+        // Iterate from the left edge to the right edge (exclusive of the right edge)
+        // and update the maximum height for each x-coordinate covered by the current building.
+        // Replaces `forr(j,l,r)`.
+        for (int j = left_edge; j < right_edge; ++j) {
+            // Ensure `j` is within the bounds of `max_height_at_x`.
+            // While the problem constraints might guarantee this, it's good practice.
+            if (j >= 0 && j < MAX_COORD) {
+                max_height_at_x[j] = std::max(max_height_at_x[j], height);
+            }
+        }
+    }
+
+    // Loop to find and print the critical points of the skyline.
+    // A critical point occurs when the height changes from the previous x-coordinate.
+    // We iterate from x-coordinate 1 up to MAX_COORD - 1 to compare with the previous coordinate.
+    // Replaces `forr(i,1,N)`.
+    for (int i = 1; i < MAX_COORD; ++i) {
+        // If the height at the current x-coordinate is different from the height
+        // at the previous x-coordinate, it's a critical point.
+        if (max_height_at_x[i - 1] != max_height_at_x[i]) {
+            // Print the x-coordinate and the new height.
+            std::cout << i << ' ' << max_height_at_x[i] << ' ';
+        }
+    }
+    std::cout << '\n'; // Add a newline at the end of the output, replacing `endll`.
+
+    return 0;
+}

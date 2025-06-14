@@ -1,0 +1,108 @@
+#include <iostream> // Required for standard input/output operations (std::cin, std::cout)
+#include <vector>   // Required for std::vector
+#include <string>   // Required for std::string
+
+/**
+ * @brief Simulates a rotation of a six-sided die.
+ *
+ * This function takes the current state of a die (represented as a vector
+ * of integers) and a command character, then updates the die's state
+ * to reflect the rotation.
+ *
+ * The `dice` vector elements map to the die faces as follows:
+ * dice[0]: Top face
+ * dice[1]: Front face
+ * dice[2]: Right face
+ * dice[3]: Back face
+ * dice[4]: Left face
+ * dice[5]: Bottom face
+ *
+ * @param dice A reference to a `std::vector<int>` representing the die's faces.
+ * This vector will be modified in place.
+ * @param com The command character indicating the type of spin ('F', 'B', 'L', 'R', 'C', 'D').
+ */
+void spin_dice(std::vector<int>& dice, char command) {
+    // A temporary vector to store the new configuration of the die faces.
+    // This is crucial to ensure all new face values are derived from the
+    // *original* state of the `dice` before any faces are overwritten.
+    std::vector<int> next_dice_state(6);
+
+    if (command == 'F') { // Roll Forward (Front becomes Top, Top becomes Back, Back becomes Bottom, Bottom becomes Front)
+        next_dice_state[0] = dice[3]; // New Top is Old Back
+        next_dice_state[1] = dice[0]; // New Front is Old Top
+        next_dice_state[2] = dice[2]; // Right face remains Right
+        next_dice_state[3] = dice[5]; // New Back is Old Bottom
+        next_dice_state[4] = dice[4]; // Left face remains Left
+        next_dice_state[5] = dice[1]; // New Bottom is Old Front
+    } else if (command == 'B') { // Roll Backward (Back becomes Top, Top becomes Front, Front becomes Bottom, Bottom becomes Back)
+        next_dice_state[0] = dice[1]; // New Top is Old Front
+        next_dice_state[1] = dice[5]; // New Front is Old Bottom
+        next_dice_state[2] = dice[2]; // Right face remains Right
+        next_dice_state[3] = dice[0]; // New Back is Old Top
+        next_dice_state[4] = dice[4]; // Left face remains Left
+        next_dice_state[5] = dice[3]; // New Bottom is Old Back
+    } else if (command == 'L') { // Roll Left (Left becomes Top, Top becomes Right, Right becomes Bottom, Bottom becomes Left)
+        next_dice_state[0] = dice[4]; // New Top is Old Left
+        next_dice_state[1] = dice[1]; // Front face remains Front
+        next_dice_state[2] = dice[0]; // New Right is Old Top
+        next_dice_state[3] = dice[3]; // Back face remains Back
+        next_dice_state[4] = dice[5]; // New Left is Old Bottom
+        next_dice_state[5] = dice[2]; // New Bottom is Old Right
+    } else if (command == 'R') { // Roll Right (Right becomes Top, Top becomes Left, Left becomes Bottom, Bottom becomes Right)
+        next_dice_state[0] = dice[2]; // New Top is Old Right
+        next_dice_state[1] = dice[1]; // Front face remains Front
+        next_dice_state[2] = dice[5]; // New Right is Old Bottom
+        next_dice_state[3] = dice[3]; // Back face remains Back
+        next_dice_state[4] = dice[0]; // New Left is Old Top
+        next_dice_state[5] = dice[4]; // New Bottom is Old Left
+    } else if (command == 'C') { // Rotate Clockwise (around the vertical axis: Front->Right->Back->Left->Front)
+        next_dice_state[0] = dice[0]; // Top face remains Top
+        next_dice_state[1] = dice[4]; // New Front is Old Left
+        next_dice_state[2] = dice[1]; // New Right is Old Front
+        next_dice_state[3] = dice[2]; // New Back is Old Right
+        next_dice_state[4] = dice[3]; // New Left is Old Back
+        next_dice_state[5] = dice[5]; // Bottom face remains Bottom
+    } else if (command == 'D') { // Rotate Counter-clockwise (around the vertical axis: Front->Left->Back->Right->Front)
+        next_dice_state[0] = dice[0]; // Top face remains Top
+        next_dice_state[1] = dice[2]; // New Front is Old Right
+        next_dice_state[2] = dice[3]; // New Right is Old Back
+        next_dice_state[3] = dice[4]; // New Back is Old Left
+        next_dice_state[4] = dice[1]; // New Left is Old Front
+        next_dice_state[5] = dice[5]; // Bottom face remains Bottom
+    }
+    // Update the original `dice` vector with the new state.
+    dice = next_dice_state;
+}
+
+int main() {
+    // Optimize C++ standard streams for faster input/output in competitive programming.
+    // `std::ios_base::sync_with_stdio(false)` unties C++ streams from C's standard I/O.
+    // `std::cin.tie(nullptr)` prevents `std::cout` from flushing before each `std::cin` operation.
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+
+    int num_queries;
+    std::cin >> num_queries; // Read the number of test cases (queries).
+
+    // Process each test case.
+    for (int i = 0; i < num_queries; ++i) {
+        std::string command_sequence;
+        std::cin >> command_sequence; // Read the sequence of commands for the current test case.
+
+        // Initialize the die to its standard starting state for each query.
+        // {Top, Front, Right, Back, Left, Bottom}
+        // Opposite faces sum to 7: (1-6, 2-5, 3-4)
+        std::vector<int> dice_state = {1, 2, 3, 5, 4, 6};
+
+        // Apply each command in the sequence to the die.
+        for (char command_char : command_sequence) {
+            spin_dice(dice_state, command_char);
+        }
+
+        // Output the value on the front face (dice_state[1]) after all commands are applied.
+        // Print a space after each result, as indicated by the original code's output.
+        std::cout << dice_state[1] << ' ';
+    }
+
+    return 0; // Indicate successful program execution.
+}

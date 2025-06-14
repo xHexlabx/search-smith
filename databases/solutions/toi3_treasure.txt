@@ -1,0 +1,93 @@
+#include <iostream>   // For input/output operations (cin, cout)
+#include <string>     // For string manipulation
+#include <cmath>      // For sqrt (square root) function
+#include <iomanip>    // For setprecision and fixed manipulators (for printing double with specific precision)
+
+/*
+    Overall Idea:
+
+    This program simulates movement on a 2D plane, starting from the origin (0,0).
+    It continuously reads movement commands, each consisting of a numerical value
+    and a cardinal or intercardinal direction (e.g., "10N", "5SE").
+
+    For each command, it updates the current position by adding or subtracting
+    the value to either the North-South (y-axis) or East-West (x-axis) coordinate.
+    Diagonal movements (NE, NW, SE, SW) distribute the value equally across
+    both axes, scaled by 1/sqrt(2) to maintain the given distance along the diagonal.
+
+    The program continues processing commands until it encounters a single asterisk "*"
+    as input. At that point, it calculates and prints:
+    1. The final East-West and North-South coordinates.
+    2. The total Euclidean distance (straight-line distance) from the origin
+       to the final position.
+    All numerical outputs are formatted to three decimal places.
+*/
+int main() {
+    // Optimize C++ standard streams for competitive programming.
+    // This unties cin/cout and disables synchronization with C's stdio.
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+
+    double east_west_coordinate = 0.0; // Represents movement along the X-axis
+    double north_south_coordinate = 0.0; // Represents movement along the Y-axis
+
+    std::string command_input;
+    // Continuously read commands until the termination signal is received.
+    while (std::cin >> command_input) {
+        // Check for the termination command.
+        if (command_input == "*") {
+            // Set output precision to three decimal places and use fixed-point notation.
+            std::cout << std::fixed << std::setprecision(3);
+
+            // Print the final East-West and North-South coordinates.
+            std::cout << east_west_coordinate << " " << north_south_coordinate << std::endl;
+
+            // Calculate and print the Euclidean distance from the origin.
+            double distance_from_origin = std::sqrt(east_west_coordinate * east_west_coordinate + north_south_coordinate * north_south_coordinate);
+            std::cout << distance_from_origin << std::endl;
+
+            return 0; // Terminate the program.
+        }
+
+        // --- Parse the command input ---
+        // Find the split point between the numeric value and the direction string.
+        size_t i = 0;
+        while (i < command_input.length() && std::isdigit(command_input[i])) {
+            i++;
+        }
+
+        // Extract the numerical value (distance).
+        int value = std::stoi(command_input.substr(0, i));
+        // Extract the direction string.
+        std::string direction = command_input.substr(i);
+
+        // --- Apply the movement based on direction ---
+        // Use a constant for 1/sqrt(2) to improve readability and avoid redundant calculations.
+        const double diagonal_factor = 1.0 / std::sqrt(2.0);
+
+        if (direction == "N") {
+            north_south_coordinate += value;
+        } else if (direction == "S") {
+            north_south_coordinate -= value;
+        } else if (direction == "E") {
+            east_west_coordinate += value;
+        } else if (direction == "W") {
+            east_west_coordinate -= value;
+        } else if (direction == "NE") {
+            east_west_coordinate += value * diagonal_factor;
+            north_south_coordinate += value * diagonal_factor;
+        } else if (direction == "NW") {
+            east_west_coordinate -= value * diagonal_factor;
+            north_south_coordinate += value * diagonal_factor;
+        } else if (direction == "SE") {
+            east_west_coordinate += value * diagonal_factor;
+            north_south_coordinate -= value * diagonal_factor;
+        } else if (direction == "SW") {
+            east_west_coordinate -= value * diagonal_factor;
+            north_south_coordinate -= value * diagonal_factor;
+        }
+        // No 'else' needed here, as invalid directions are simply ignored.
+    }
+
+    return 0; // Should not be reached in typical execution if '*' is always provided.
+}

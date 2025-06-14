@@ -1,0 +1,32 @@
+#include <bits/stdc++.h>
+typedef long long ll;
+using namespace std;
+
+const int N = 1010;
+pair<int,int> dp[N][N];
+int A[N],B[N];
+int n,m;
+
+pair<int,int> cal(pair<int,int> a,int b){
+    if(a.second+b>m)return {a.first+1,b};
+    return {a.first,a.second+b};
+}
+
+int main(){
+    ios::sync_with_stdio(0);cin.tie(0);cout.tie(0);
+
+    cin >> m >> n;
+    for(int i=1;i<n+1;i++)cin >> A[i];
+    for(int i=1;i<n+1;i++)cin >> B[i];
+
+    for(int i=0;i<n+1;i++)for(int j=0;j<n+1;j++){
+        if(i==0&&j==0)continue;
+        dp[i][j] = {1e9,1e9};
+        if(i)dp[i][j] = min(dp[i][j],cal(dp[i-1][j],A[i]));
+        if(j)dp[i][j] = min(dp[i][j],cal(dp[i][j-1],B[j]));
+    }
+
+    cout << dp[n][n].first+(dp[n][n].second>0) << "\n" << dp[n][n].second;
+
+    return 0;
+}

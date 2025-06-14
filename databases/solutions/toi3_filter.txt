@@ -1,0 +1,27 @@
+#include<bits/stdc++.h>
+using namespace std;
+int main(){
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	int x,w,h,n,a;
+	cin>>w>>h>>n;
+	int ar[w];
+	memset(ar,0,sizeof(ar));
+	while(n--){
+		cin>>x>>a;
+		for(int i=x;i<x+a and i<w;i++){
+			ar[i]++;
+		}
+	}
+	int half=0,no=0;
+	for(int i=0;i<w;i++){
+		if(ar[i]==1){
+			half++;
+		}
+		if(ar[i]==0){
+			no++;
+		}
+	}
+	cout<<no*h<<' '<<half*h;
+	return 0;
+}

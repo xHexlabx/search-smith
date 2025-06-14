@@ -1,0 +1,32 @@
+#include <bits/stdc++.h>
+typedef long long ll;
+using namespace std;
+
+int n;
+vector<int> mark;
+
+void solve(int i){
+    if(i==n){
+        for(auto j:mark){
+            if(j==1)cout << "--" << "\n";
+            else cout << "||" << "\n";
+        }
+        cout << "E" << "\n";
+    }else if(i<n){
+        mark.push_back(1);
+        solve(i+1);
+        mark.pop_back();
+        mark.push_back(2);
+        solve(i+2);
+        mark.pop_back();
+    }
+}
+
+int main(){
+    ios::sync_with_stdio(0);cin.tie(0);cout.tie(0);
+
+    cin >> n;
+    solve(0);
+
+    return 0;
+}

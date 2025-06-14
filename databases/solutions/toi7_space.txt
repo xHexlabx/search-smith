@@ -1,0 +1,27 @@
+#include <bits/stdc++.h>
+typedef long long ll;
+using namespace std;
+int n;
+void search(string s){
+    if(s.size()==n){
+        for(int i=n-1;i>-1;i--){
+            if(s[i]=='1')continue;
+            cout << s << ' ';
+            s[i]='1';
+            cout << s << "\n";
+            s[i]='0';
+        }
+    }else{
+        search(s+'0');
+        search(s+'1');
+    }
+}
+
+int main(){
+    ios::sync_with_stdio(0);cin.tie(0);cout.tie(0);
+
+    cin >> n;
+    search("");
+
+    return 0;
+}

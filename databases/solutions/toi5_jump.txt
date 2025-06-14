@@ -1,0 +1,22 @@
+#include <bits/stdc++.h>
+typedef long long ll;
+using namespace std;
+const int N=3*1e4;
+int A[N];
+int main(){
+    ios::sync_with_stdio(0);cin.tie(0);cout.tie(0);
+
+    int n,k;
+    cin >> n >> k;
+    for(int i=0;i<n;i++)cin >> A[i];
+
+    int mx=-1;
+    for(int i=0;i<n;i++){
+        int x=A[i]+k;
+        int pos=upper_bound(A+i-1,A+n,x)-A-1;
+        mx=max(mx,pos-i);
+    }
+    cout << mx;
+
+    return 0;
+}

@@ -1,0 +1,89 @@
+#include <bits/stdc++.h>
+#define ll long long
+
+using namespace std;
+
+void solve_test_case() {
+    int num_edges, num_nodes;
+    cin >> num_edges >> num_nodes;
+
+    vector<int> adj[num_nodes + 5], reverse_adj[num_nodes + 5];
+    vector<pair<int, int>> edges(num_edges);
+    
+    int negation_map[num_nodes + 5];
+    int visited_scc[num_nodes + 5];
+    int scc_id = 0;
+    
+    memset(visited_scc, 0, sizeof(visited_scc));
+
+    for (auto &[u, v] : edges) {
+        cin >> u >> v;
+    }
+
+    for (int i = 0; i < num_nodes / 2; i++) {
+        int u, v;
+        cin >> u >> v;
+        negation_map[u] = v;
+        negation_map[v] = u;
+    }
+
+    for (auto &[u, v] : edges) {
+        adj[negation_map[u]].emplace_back(v);
+        adj[negation_map[v]].emplace_back(u);
+        reverse_adj[u].emplace_back(negation_map[v]);
+        reverse_adj[v].emplace_back(negation_map[u]);
+    }
+
+    vector<int> node_order_dfs1;
+    function<void(int)> dfs_pass1 = [&](int u) {
+        visited_scc[u] = 1;
+        for (int v : adj[u]) {
+            if (!visited_scc[v]) {
+                dfs_pass1(v);
+            }
+        }
+        node_order_dfs1.emplace_back(u);
+    };
+    
+    function<void(int)> dfs_pass2 = [&](int u) {
+        visited_scc[u] = scc_id;
+        for (int v : reverse_adj[u]) {
+            if (!visited_scc[v]) {
+                dfs_pass2(v);
+            }
+        }
+    };
+
+    for (int i = 1; i <= num_nodes; i++) {
+        if (!visited_scc[i]) {
+            dfs_pass1(i);
+        }
+    }
+    
+    reverse(node_order_dfs1.begin(), node_order_dfs1.end());
+    memset(visited_scc, 0, sizeof(visited_scc));
+
+    for (int node : node_order_dfs1) {
+        if (!visited_scc[node]) {
+            ++scc_id;
+            dfs_pass2(node);
+        }
+    }
+
+    for (int i = 1; i <= num_nodes; i += 2) {
+        if (visited_scc[i] == visited_scc[negation_map[i]]) {
+            cout << 'N';
+            return;
+        }
+    }
+    cout << 'Y';
+}
+
+int main() {
+    ios::sync_with_stdio(0), cin.tie(0);
+    for (int i = 0; i < 5; i++) {
+        solve_test_case();
+    }
+    cout << '\n';
+    return 0;
+}

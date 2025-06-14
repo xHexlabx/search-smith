@@ -1,0 +1,111 @@
+#include <iostream>   // For std::cin, std::cout
+#include <vector>     // For std::vector
+#include <string>     // For std::string
+#include <cctype>     // For std::tolower
+
+// The overall idea of this code is to implement a word search puzzle solver.
+// It reads a grid of characters (the "board") and a list of words.
+// For each word, it searches if the word exists in the board, starting from any cell
+// and extending in any of the 8 cardinal and diagonal directions.
+// If found, it outputs the starting row and column of the first occurrence.
+
+// Global variables for board dimensions and direction vectors.
+// While global variables are sometimes used in competitive programming for brevity,
+// passing them as parameters or encapsulating them in a struct/class can improve
+// code organization and reusability for larger projects.
+std::vector<std::string> board; // Stores the character grid
+int rows, cols;                 // Dimensions of the board
+
+// Arrays to represent the 8 possible directions (row_offset, col_offset)
+// Top-Left to Bottom-Right order: North, North-East, East, South-East, South, South-West, West, North-West
+const int DR[] = {-1, -1, 0, 1, 1, 1, 0, -1};
+const int DC[] = {0, 1, 1, 1, 0, -1, -1, -1};
+
+// Recursive helper function to check if a word can be formed in a specific direction.
+// Parameters:
+// - `current_row`, `current_col`: Current position on the board.
+// - `row_dir`, `col_dir`: Direction of movement (e.g., -1, 0 for North).
+// - `target_word`: The word being searched for.
+// - `char_index`: The index of the character in `target_word` we are currently trying to match.
+bool search_in_direction(int current_row, int current_col, int row_dir, int col_dir,
+                         const std::string& target_word, int char_index) {
+    // Base case 1: Check if the current position is out of board boundaries.
+    if (current_row < 0 || current_row >= rows || current_col < 0 || current_col >= cols) {
+        return false;
+    }
+
+    // Base case 2: Check if the character at the current board position matches
+    // the character at `char_index` in the `target_word` (case-insensitive).
+    if (std::tolower(board[current_row][current_col]) != std::tolower(target_word[char_index])) {
+        return false;
+    }
+
+    // Base case 3: If we have matched all characters of the target word, we found it.
+    if (char_index == target_word.length() - 1) {
+        return true;
+    }
+
+    // Recursive step: Move to the next character in the specified direction.
+    return search_in_direction(current_row + row_dir, current_col + col_dir,
+                               row_dir, col_dir, target_word, char_index + 1);
+}
+
+// Function to check if a word exists starting from a given position in any of the 8 directions.
+// Parameters:
+// - `start_row`, `start_col`: Starting position on the board.
+// - `target_word`: The word to search for.
+bool find_word_from_start_point(int start_row, int start_col, const std::string& target_word) {
+    // Iterate through all 8 possible directions.
+    for (int i = 0; i < 8; ++i) {
+        // If the word is found in any direction, return true immediately.
+        if (search_in_direction(start_row, start_col, DR[i], DC[i], target_word, 0)) {
+            return true;
+        }
+    }
+    return false; // Word not found from this starting point in any direction.
+}
+
+int main() {
+    // Optimize C++ standard streams for competitive programming (faster I/O).
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+
+    // Read board dimensions.
+    std::cin >> rows >> cols;
+
+    // Resize the board to store the input rows.
+    board.resize(rows);
+    // Read the board characters row by row.
+    for (int i = 0; i < rows; ++i) {
+        std::cin >> board[i];
+    }
+
+    int num_queries; // Number of words to search for.
+    std::cin >> num_queries;
+
+    // Process each query (each word to search).
+    while (num_queries--) {
+        std::string current_word;
+        std::cin >> current_word;
+
+        bool found_word = false; // Flag to indicate if the word has been found.
+
+        // Iterate through each cell of the board as a potential starting point.
+        for (int r_idx = 0; r_idx < rows; ++r_idx) {
+            for (int c_idx = 0; c_idx < cols; ++c_idx) {
+                // If the word is found starting from (r_idx, c_idx), print the coordinates
+                // and set the flag to break outer loops.
+                if (find_word_from_start_point(r_idx, c_idx, current_word)) {
+                    std::cout << r_idx << ' ' << c_idx << std::endl;
+                    found_word = true;
+                    break; // Break from inner (column) loop
+                }
+            }
+            if (found_word) {
+                break; // Break from outer (row) loop
+            }
+        }
+    }
+
+    return 0;
+}

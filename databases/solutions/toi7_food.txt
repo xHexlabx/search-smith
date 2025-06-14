@@ -1,0 +1,57 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+int total_elements;
+int num_excluded_first_elements;
+int excluded_first_elements[10];
+bool element_used[10];
+vector<int> current_permutation;
+
+void generate_permutations() {
+    if (current_permutation.size() == total_elements) {
+        for (int i = 0; i < total_elements; ++i) {
+            cout << current_permutation[i] << " ";
+        }
+        cout << "\n";
+        return;
+    }
+
+    for (int i = 1; i <= total_elements; ++i) {
+        bool is_excluded_as_first = false;
+        if (current_permutation.empty()) {
+            for (int j = 0; j < num_excluded_first_elements; ++j) {
+                if (i == excluded_first_elements[j]) {
+                    is_excluded_as_first = true;
+                    break;
+                }
+            }
+        }
+
+        if (is_excluded_as_first) {
+            continue;
+        }
+
+        if (element_used[i]) {
+            continue;
+        }
+
+        element_used[i] = true;
+        current_permutation.push_back(i);
+
+        generate_permutations();
+
+        element_used[i] = false;
+        current_permutation.pop_back();
+    }
+}
+
+int main() {
+    cin >> total_elements >> num_excluded_first_elements;
+    for (int i = 0; i < num_excluded_first_elements; ++i) {
+        cin >> excluded_first_elements[i];
+    }
+    generate_permutations();
+
+    return 0;
+}

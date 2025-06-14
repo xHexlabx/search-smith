@@ -1,0 +1,66 @@
+#include <iostream> // For input/output operations (std::cin, std::cout)
+#include <vector>   // For dynamic arrays (std::vector)
+#include <string>   // For string manipulation (std::string)
+
+// Function to optimize C++ standard stream I/O for faster execution.
+// This is common practice in competitive programming.
+void setup_fast_io() {
+    std::ios_base::sync_with_stdio(false); // Untie C++ streams from C standard streams
+    std::cin.tie(nullptr);                  // Untie std::cin from std::cout
+}
+
+// Simulates dropping 'num_blocks' into a specific 'column_index' of the grid.
+// Blocks fall until they hit an 'O' (obstacle) or the bottom of the grid,
+// and then stack up upwards from that point.
+void drop_blocks_in_column(int column_index, int num_blocks, int num_rows, std::vector<std::string>& grid) {
+    int drop_stop_row = num_rows; // Initialize to indicate no obstacle found yet (falls to bottom)
+
+    // Find the highest obstacle 'O' or the bottom of the grid in this column.
+    // Blocks will stack just above this point.
+    for (int row = 0; row < num_rows; ++row) {
+        if (grid[row][column_index] == 'O') {
+            drop_stop_row = row; // Found an obstacle, blocks stop before this row
+            break;               // No need to check further down
+        }
+    }
+
+    // Now, starting from the row directly above the drop_stop_row,
+    // place '#' blocks as long as there are blocks to drop and
+    // we haven't gone past the top of the grid.
+    for (int current_row_to_fill = drop_stop_row - 1; 
+         current_row_to_fill >= 0 && num_blocks > 0; 
+         --current_row_to_fill) {
+        
+        grid[current_row_to_fill][column_index] = '#';
+        num_blocks--; // One block dropped
+    }
+}
+
+int main() {
+    setup_fast_io(); // Enable fast I/O
+
+    int num_rows, num_cols;
+    // Read the dimensions of the grid (N rows, M columns)
+    std::cin >> num_rows >> num_cols;
+
+    // Declare and read the initial state of the grid
+    std::vector<std::string> grid(num_rows);
+    for (int i = 0; i < num_rows; ++i) {
+        std::cin >> grid[i];
+    }
+
+    // For each column, read the number of blocks to drop and simulate the drop
+    for (int j = 0; j < num_cols; ++j) {
+        int blocks_to_drop_in_this_column;
+        std::cin >> blocks_to_drop_in_this_column;
+        // Call our dedicated function to handle dropping for this column
+        drop_blocks_in_column(j, blocks_to_drop_in_this_column, num_rows, grid);
+    }
+
+    // Print the final state of the grid after all blocks have been dropped
+    for (int i = 0; i < num_rows; ++i) {
+        std::cout << grid[i] << '\n';
+    }
+
+    return 0; // Indicate successful execution
+}

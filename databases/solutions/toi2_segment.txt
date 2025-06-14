@@ -1,0 +1,80 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <map>
+#include <numeric> // Not directly used in this refactoring, but often useful for competitive programming
+
+// The overall idea of this code is to parse two numbers represented as 7-segment display patterns
+// and then calculate their sum.
+
+// A map to store the 7-segment display patterns for each digit (0-9).
+// The key is a vector of three strings, representing the top, middle, and bottom rows of the digit's pattern.
+// The value is the character representation of the digit.
+std::map<std::vector<std::string>, char> segment_patterns = {
+    {{" _ ", "| |", "|_|"}, '0'},
+    {{"   ", "  |", "  |"}, '1'},
+    {{" _ ", " _|", "|_ "}, '2'},
+    {{" _ ", " _|", " _|"}, '3'},
+    {{"   ", "|_|", "  |"}, '4'},
+    {{" _ ", "|_ ", " _|"}, '5'},
+    {{" _ ", "|_ ", "|_|"}, '6'},
+    {{" _ ", "  |", "  |"}, '7'},
+    {{" _ ", "|_|", "|_|"}, '8'},
+    {{" _ ", "|_|", " _|"}, '9'}
+};
+
+// Function to convert a set of 7-segment display pattern lines into a numeric string.
+// `display_lines`: A vector of three strings representing the top, middle, and bottom lines of the entire number.
+// `num_digits`: The number of digits expected in the pattern.
+std::string parse_display_to_number_string(const std::vector<std::string>& display_lines, long long num_digits) {
+    std::string result_number_string;
+    // Iterate through each digit in the display
+    for (int i = 0; i < num_digits; ++i) {
+        std::vector<std::string> current_digit_pattern(3); // To store the 3 lines of the current digit
+        // Extract the 3x3 pattern for the current digit
+        for (int j = 0; j < 3; ++j) {
+            // Each digit occupies 3 characters, and there's a 1-character space, so 4 characters per digit
+            current_digit_pattern[j] = display_lines[j].substr(i * 4, 3);
+        }
+        // Look up the extracted pattern in the map and append the corresponding digit to the result string
+        result_number_string += segment_patterns[current_digit_pattern];
+    }
+    return result_number_string;
+}
+
+int main() {
+    // Optimize C++ standard streams for competitive programming (faster I/O)
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+
+    long long len_a, len_b; // Lengths of the two numbers
+    std::cin >> len_a >> len_b;
+
+    // Consume the rest of the current line after reading len_a and len_b,
+    // as getline will read it in the next step.
+    std::cin.ignore();
+
+    // Vector to store all 6 lines of the 7-segment display input (3 for the first number, 3 for the second)
+    std::vector<std::string> all_display_input_lines(6);
+    for (int i = 0; i < 6; ++i) {
+        std::getline(std::cin, all_display_input_lines[i]);
+    }
+
+    // Extract the lines for the first number
+    std::vector<std::string> first_num_lines = {all_display_input_lines[0], all_display_input_lines[1], all_display_input_lines[2]};
+    // Parse the first number's display pattern into a string
+    std::string first_number_str = parse_display_to_number_string(first_num_lines, len_a);
+
+    // Extract the lines for the second number
+    std::vector<std::string> second_num_lines = {all_display_input_lines[3], all_display_input_lines[4], all_display_input_lines[5]};
+    // Parse the second number's display pattern into a string
+    std::string second_number_str = parse_display_to_number_string(second_num_lines, len_b);
+
+    // Convert the parsed number strings to long long integers and calculate their sum
+    long long sum = std::stoll(first_number_str) + std::stoll(second_number_str);
+
+    // Print the sum
+    std::cout << sum << '\n';
+
+    return 0;
+}

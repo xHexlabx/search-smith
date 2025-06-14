@@ -1,0 +1,28 @@
+#include <bits/stdc++.h>
+typedef long long ll;
+using namespace std;
+
+const int N = 5e5 + 10;
+ll n,k;
+ll p[N],dp[N];
+deque<int> dq;
+
+int main(){
+    ios::sync_with_stdio(0);cin.tie(0);cout.tie(0);
+
+    cin >> n >> k;
+    for(int i=1;i<n+1;i++)cin >> p[i];
+
+    dq.push_back(1);
+    dp[1] = p[1];
+    for(int i=2;i<n+1;i++){
+        while(!dq.empty()&&i-dq.front()>k)dq.pop_front();
+        dp[i] = p[i] + dp[dq.front()];
+        while(!dq.empty()&&dp[i]<=dp[dq.back()])dq.pop_back();
+        dq.push_back(i);
+    }
+
+    cout << dp[n];
+
+    return 0;
+}

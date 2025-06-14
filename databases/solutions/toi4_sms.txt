@@ -1,0 +1,17 @@
+#include <bits/stdc++.h>
+using namespace std;
+int main(void) {	   
+    int n,st,num; cin >> n >> st >> num;	   
+    const string sms[] = { "exoworldgd", "-", "ABC", "DEF", "GHI", "JKL", "MNO", "PQRS", "TUV", "WXYZ" };	   
+    string ans; num--;	   
+    if (sms[st] != "-") ans.push_back(sms[st][num % sms[st].size()]);	   
+    n--;	   
+    while (n--) {	        
+        int u, v, m; cin >> u >> v >> m, m--;	       
+        st += 3*v+u;	       
+        if (sms[st] != "-") ans.push_back(sms[st][m % sms[st].size()]);	       
+        else for (int i = 0; i <= m; i++) if (!ans.empty()) ans.pop_back();	  
+    }	   
+    if (ans.empty()) cout << "null";	   
+    else cout << ans;
+}

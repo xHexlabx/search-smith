@@ -1,0 +1,55 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <map>
+
+int main() {
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+
+    int num_intervals, max_concurrent_intervals, num_queries;
+    std::cin >> num_intervals >> max_concurrent_intervals >> num_queries;
+
+    std::vector<std::pair<std::pair<int, bool>, int>> events;
+    for (int i = 1; i <= num_intervals; ++i) {
+        int start_time, end_time;
+        std::cin >> start_time >> end_time;
+        events.push_back({{start_time, true}, i});  // true indicates start event
+        events.push_back({{end_time + 1, false}, i}); // false indicates end event
+    }
+
+    std::sort(events.begin(), events.end());
+
+    std::vector<bool> is_accepted(num_intervals + 1, false);
+    int current_concurrent_intervals = 0;
+
+    for (const auto& event : events) {
+        int time = event.first.first;
+        bool is_start_event = event.first.second;
+        int interval_id = event.second;
+
+        if (is_start_event) {
+            if (current_concurrent_intervals < max_concurrent_intervals) {
+                is_accepted[interval_id] = true;
+                current_concurrent_intervals++;
+            }
+        } else { // It's an end event
+            if (is_accepted[interval_id]) {
+                current_concurrent_intervals--;
+            }
+        }
+    }
+
+    for (int i = 0; i < num_queries; ++i) {
+        int query_id;
+        std::cin >> query_id;
+        if (is_accepted[query_id]) {
+            std::cout << "Y ";
+        } else {
+            std::cout << "N ";
+        }
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
