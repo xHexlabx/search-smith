@@ -1,0 +1,136 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+
+const int mod = 1000003;
+
+
+int nCr[1205][1205];
+
+int a[1505][1505];
+
+int qsL[1505][1505],qsR[1505][1505];
+
+
+
+signed main(){
+
+    ios_base::sync_with_stdio(false);
+
+    cin.tie(NULL);
+
+
+    int n,m,k;
+
+    cin >> n >> m >> k;
+
+
+    nCr[0][0]=1;
+
+    for(int i=1;i<=610;i++){
+
+        for(int j=0;j<=min(i,k);j++){
+
+            if(j==0||j==i)nCr[i][j]=1;
+
+            else{
+
+                nCr[i][j]=nCr[i-1][j]+nCr[i-1][j-1];
+
+                nCr[i][j]%=mod;
+
+            }
+
+        }
+
+    }
+
+
+    for(int i=601;i<=n+600;i++){
+
+        string x;
+
+        cin >> x;
+
+        int cnt=0;
+
+        for(int j=601;j<=m+600;j++){
+
+            if(x[cnt]=='#'){
+
+                a[i][j]=1;
+
+            }
+
+            cnt++;
+
+        }
+
+    }
+
+    for(int i=1;i<=n+1200;i++){
+
+        for(int j=1;j<=m+1200;j++){
+
+            if(a[i][j]){
+
+                qsL[i][j]+=1;
+
+                qsR[i][j]+=1;
+
+            }
+
+            qsL[i][j]+=qsL[i-1][j-1];
+
+            qsR[i][j]+=qsR[i-1][j+1];
+
+        }
+
+    }
+
+
+
+    int ans=0;
+
+    for(int sz=1;sz<=n+m;sz++){
+
+        for(int i=601;i<=n+600;i++){
+
+            for(int j=601;j<=m+600;j++){
+
+                
+
+                    int star=0;
+
+                    star += a[i-sz][j] + a[i][j+sz] + a[i][j-sz] + a[i+sz][j];    
+
+                    star += qsL[i-1][j+sz-1]-qsL[i-sz][j];
+
+                    star += qsR[i-1][j-sz+1]-qsR[i-sz][j];
+
+                    star += qsL[i+sz-1][j-1]-qsL[i][j-sz];
+
+                    star += qsR[i+sz-1][j+1]-qsR[i][j+sz];
+
+        
+
+                    ans += nCr[star][k];
+
+                    ans%=mod;
+
+                
+
+            }
+
+        }
+
+    }
+
+    cout << ans;
+
+    
+
+    return 0;
+
+}
