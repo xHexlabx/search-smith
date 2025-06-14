@@ -1,22 +1,32 @@
-# Gemini API for File Parsing
-# ใช้สำหรับ documents_handler.py เวอร์ชันล่าสุดที่ใช้ File API
-google-generativeai
-
-# Core libraries for LangChain and Vector DB
-# ใช้สำหรับโหลดเอกสาร, แบ่งข้อความ, และจัดการ Vector Store
+# --- Core libraries for LangChain ---
+# Used for document loading, text splitting, chains, and prompts
 langchain
 langchain-community
+
+# --- LLM and Vector DB Integrations ---
+# NEW: For the Gemini API integration via LangChain (used in documents_handler.py)
+langchain-google-genai
+# Handles parsing of various document types, including Markdown
+unstructured 
+# The Vector Store used in the project
 chromadb
 
-# For Hugging Face Embeddings
-# ใช้สำหรับสร้าง Embeddings ใน vector_database_setup.py และ main.py
+# --- Google Generative AI SDK ---
+# Direct SDK, often a peer dependency for LangChain integrations
+google-generativeai
+
+# --- For Hugging Face Embeddings ---
+# Used for creating embeddings in vector_database_setup.py and main.py
 sentence-transformers
 torch
+# Note: transformers, accelerate, and bitsandbytes are dependencies for sentence-transformers
+# and are explicitly listed for clarity and version control.
 transformers
 accelerate
 bitsandbytes
 
-# Utilities
-# ไลบรารีเสริมที่ใช้ในสคริปต์ต่างๆ
+# --- Utilities ---
+# For loading environment variables (like API keys) from a .env file
 python-dotenv
+# A utility for creating progress bars
 tqdm

@@ -3,64 +3,56 @@
 import os
 from dotenv import load_dotenv
 from langchain_community.document_loaders import UnstructuredMarkdownLoader
-from langchain_huggingface import HuggingFacePipeline
+# CHANGED: Import for Gemini model
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-# Import transformers components for robust local model loading
-from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
 # --- Constants ---
 # Assumes the script is run from the project's root directory
 PROMPT_FILE_PATH = "prompts/tagger.txt"
 DOCUMENTS_DIR = "databases/texts"
-# IMPORTANT: This path should point to your local model directory
-MODEL_PATH = "Qwen/Qwen3-8B" 
+# NEW: Define the Gemini model to use
+GEMINI_MODEL_NAME = "gemini-2.0-flash" 
+# REMOVED: MODEL_PATH is no longer needed for API calls
 
 def documents_setup():
     """
-    Initializes and runs the document tagging process using a local Hugging Face model.
+    Initializes and runs the document tagging process using the Gemini API.
 
-    This function sets up a local Hugging Face model via LangChain, loads a prompt
+    This function sets up the Gemini API via LangChain, loads a prompt
     template, and then iterates through .md documents in a specified
     directory. For each document, it invokes the model to generate
     descriptive tags based on the content.
     """
-    print("🚀 Starting document setup...")
-
-    # Note: API keys are not needed for running a model locally.
+    # Load environment variables from .env file (for GOOGLE_API_KEY)
+    load_dotenv()
     
-    # 2. Set up the Language Model (Hugging Face from local path)
+    print("🚀 Starting document setup with Gemini API...")
+
+    # 2. Set up the Language Model (Gemini API)
     try:
-        # This initial log is helpful to confirm the model path
-        print(f"✅ Loading LLM from local path: {MODEL_PATH}")
-        
-        tokenizer = AutoTokenizer.from_pretrained(
-            MODEL_PATH,
-            trust_remote_code=True
-        )
-        model = AutoModelForCausalLM.from_pretrained(
-            MODEL_PATH,
-            trust_remote_code=True,
-            device_map="auto"
-        )
+        # Check if the API key is available
+        if not os.getenv("GOOGLE_API_KEY"):
+            print("❌ Error: GOOGLE_API_KEY not found in environment variables.")
+            print("   Please create a .env file and add your GOOGLE_API_KEY.")
+            return
 
-        text_gen_pipeline = pipeline(
-            "text-generation",
-            model=model,
-            tokenizer=tokenizer,
-            max_new_tokens=50,
-            temperature=0.5
-        )
-
-        llm = HuggingFacePipeline(pipeline=text_gen_pipeline)
+        print(f"✅ Initializing Gemini model: {GEMINI_MODEL_NAME}")
         
-        print(f"✅ LLM ({os.path.basename(MODEL_PATH)}) loaded successfully.")
+        # Instantiate the Gemini model with specific parameters
+        llm = ChatGoogleGenerativeAI(
+            model=GEMINI_MODEL_NAME,
+            temperature=0.2,
+            max_output_tokens=1000 # Note: equivalent to max_new_tokens
+        )
+        
+        print("✅ Gemini model initialized successfully.")
     except Exception as e:
-        print(f"❌ Failed to load LLM from local path: {e}")
-        print("   Please ensure the path is correct and the directory contains all necessary model files (e.g., config.json, model weights).")
+        print(f"❌ Failed to initialize Gemini API: {e}")
         return
 
-    # 3. Load the Prompt Template from file
+    # 3. Load the Prompt Template from file (No change here)
     try:
         with open(PROMPT_FILE_PATH, "r", encoding="utf-8") as f:
             prompt_template_string = f.read()
@@ -70,7 +62,7 @@ def documents_setup():
         print(f"❌ Error: Prompt file not found at '{PROMPT_FILE_PATH}'.")
         return
 
-    # 4. Create the LangChain Chain (LCEL)
+    # 4. Create the LangChain Chain (LCEL) (No change here)
     chain = prompt_template | llm | StrOutputParser()
 
     # 5. Process Each Markdown Document
@@ -79,11 +71,12 @@ def documents_setup():
         print(f"⚠️ Warning: Directory not found: '{DOCUMENTS_DIR}'.")
         return
 
+    # NOTE: I have removed the `[:1]` slice to process ALL files. 
+    # Add it back if you only want to test with one file.
     for filename in os.listdir(DOCUMENTS_DIR):
         if filename.endswith(".md"):
             file_path = os.path.join(DOCUMENTS_DIR, filename)
             try:
-                # The "Loading..." and "Tagging..." logs are removed from here
                 loader = UnstructuredMarkdownLoader(file_path)
                 docs = loader.load()
 
@@ -94,7 +87,6 @@ def documents_setup():
                 content = docs[0].page_content
                 tags = chain.invoke({"question_markdown": content})
                 
-                # MODIFIED: Cleaner final output line including the filename.
                 print(f"🏷️  {filename}: {tags.strip()}")
 
             except Exception as e:
