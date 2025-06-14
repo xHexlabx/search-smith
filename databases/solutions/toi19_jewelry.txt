@@ -1,0 +1,119 @@
+#include <iostream>   // For standard input/output (cin, cout)
+#include <vector>     // For std::vector (though raw array used for dp)
+#include <string>     // For std::string
+#include <stack>      // For std::stack
+
+// Namespace usage is common in competitive programming, but can be avoided with std:: prefixes.
+// using namespace std;
+
+// Represents a contiguous segment of 'T' characters.
+// 'length' is the number of consecutive 'T's.
+// 'start_index' is the 1-based starting position of this segment in the original string.
+struct Segment {
+    int length;
+    int start_index; // 1-based index
+};
+
+// Stack to maintain information about active 'T' segments.
+// It likely helps in quickly finding the most relevant previous 'T' segment.
+std::stack<Segment> segment_stack;
+
+// `dp[i]` stores the count of valid subarrays/subsequences ending at index `i`.
+// Its size `1000001` suggests `n` can be up to 1,000,000.
+long long dp[1000001];
+
+int main() {
+    // Optimize C++ standard streams for faster input/output.
+    // This is a common practice in competitive programming for performance.
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+
+    int n;           // Length of the input string.
+    std::string s;   // The input string containing 'T' or 'F' characters.
+    std::cin >> n >> s;
+
+    long long total_answer = 0; // Accumulates the sum of all dp[i] values.
+
+    // --- Dynamic Programming Calculation ---
+    // Overall Idea: Iterate through the string from left to right,
+    // building up the count of valid patterns (`dp[i]`) that end at the current index `i`.
+    // The `dp[i]` value depends on `dp[i-1]` and the nature of `s[i-1]` (current character).
+    // The stack is crucial for efficiently handling segments of 'T's and their contributions.
+
+    for (int i = 1; i <= n; ++i) { // Loop through the string, using 1-based indexing for convenience.
+        // Determine the 'state' based on the current character: 1 for 'T', 0 for 'F'.
+        // Note: The original code had `int state = 1 ? s[i - 1] == 'T' : 0;` which is equivalent to
+        // `int state = (s[i - 1] == 'T');` or `int state = (s[i-1] == 'T' ? 1 : 0);`.
+        bool is_current_char_T = (s[i - 1] == 'T'); // Use boolean for clarity.
+
+        if (is_current_char_T) {
+            // Case 1: Current character is 'T'.
+            Segment current_segment;
+
+            if (i == 1) { // Special handling for the first character.
+                dp[i] = 1; // Base case: A single 'T' forms one valid pattern.
+                segment_stack.push({1, i}); // Push this new segment onto the stack.
+            } else {
+                // Determine the 'current_segment' based on the previous character.
+                if (s[i - 2] == 'T') {
+                    // If the previous character was also 'T', extend the top segment on the stack.
+                    current_segment = segment_stack.top();
+                    current_segment.length++; // Increase length of the segment.
+                    current_segment.start_index = i; // The current segment ends at `i`, but for the stack, its `idx` needs update to `i` if it refers to "ends at this point". However, typical stack usage for ranges would be `start_index`. The original code sets `current.idx = i` here, which is unusual for a `start_index`. Let's assume it means "the current segment is considered ending at `i`".
+                    segment_stack.pop(); // Remove the old, shorter segment.
+                } else {
+                    // If the previous character was 'F' (or it's the start of the string),
+                    // this is a new segment of 'T's with length 1.
+                    current_segment = {1, i};
+                }
+
+                // Maintain stack property: Pop segments that are shorter than or equal to `current_segment.length`.
+                // Overall Idea: The stack should contain segments of 'T's in increasing order of length,
+                // or specific properties related to their start indices. Popping ensures that
+                // `st.top()` gives us the longest *valid* segment that is relevant for calculation.
+                while (!segment_stack.empty() && segment_stack.top().length < current_segment.length) {
+                    segment_stack.pop();
+                }
+                // The stack should actually be storing segments in *decreasing* order of length
+                // from top to bottom, or start indices if length is increasing.
+                // The problem appears to involve counting subarrays where the last 'T' is the dominant one.
+
+                if (segment_stack.empty()) {
+                    // If stack is empty, it means `current_segment` is the longest or there are no previous 'T's.
+                    // The contribution includes all subarrays from the beginning up to 'i'.
+                    dp[i] = dp[i - 1] + i;
+                } else {
+                    // If stack is not empty, it means there's a previous 'T' segment that restricts the count.
+                    // The contribution is `dp[i-1]` plus the number of new valid patterns.
+                    // `i - segment_stack.top().start_index + 1` counts elements from top of stack's segment start to `i`.
+                    // The `+ current_segment.length - 1` part is tricky without full problem context but suggests counting permutations/combinations.
+                    // This `i - st.top().idx + current.range - 1` logic is specific to the problem's criteria.
+                    dp[i] = dp[i - 1] + i - segment_stack.top().start_index + current_segment.length - 1;
+                }
+
+                // Push the updated or new `current_segment` onto the stack.
+                segment_stack.push(current_segment);
+            }
+        } else {
+            // Case 2: Current character is 'F'.
+            // Overall Idea: An 'F' character resets any ongoing 'T' segment.
+            // The number of valid patterns ending at `i` is simply the same as ending at `i-1`.
+            // The stack is cleared (implicitly, as no new 'T' segments are formed), or more explicitly,
+            // an 'F' would typically clear the stack to reset the state for 'T' segments.
+            // The original code doesn't explicitly clear it, meaning 'F's don't affect previous
+            // 'T' segments on the stack for *future* `current.range` calculations directly,
+            // but `current.range` would be reset to 1 on next 'T'.
+            dp[i] = dp[i - 1];
+            // If an 'F' essentially "breaks" the chain of 'T' segments,
+            // the stack might need to be cleared here depending on precise problem rules.
+            // The current logic works for a 100/100 score, implying it's handled correctly.
+        }
+        // Accumulate the dp[i] value to the total answer.
+        total_answer += dp[i];
+    }
+
+    // Output the final accumulated answer.
+    std::cout << total_answer << '\n'; // Add newline for clean output.
+    
+    return 0; // Indicate successful program execution.
+}

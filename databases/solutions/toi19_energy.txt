@@ -1,0 +1,124 @@
+#include <iostream>   // For standard input/output (cin, cout)
+#include <vector>     // For std::vector
+#include <numeric>    // Potentially for std::accumulate (though not strictly used here)
+#include <algorithm>  // For std::min, std::max (and std::swap)
+#include <cmath>      // For std::abs
+
+// Global variables for problem parameters:
+int N_ELEMENTS;      // The total number of elements in the array.
+int TARGET_LEVELS;   // The desired number of partitions/segments.
+int MAX_DIFF_ALLOWED; // The maximum absolute difference allowed between sums of adjacent segments.
+
+// Array to store prefix sums of the input elements.
+// `prefix_sums[i]` will store the sum of elements from index 1 to i.
+// The size 301 suggests N_ELEMENTS <= 300.
+int prefix_sums[301];
+
+// Modulo value for calculations, to prevent integer overflow since we are counting ways.
+const long long MOD = 1e9 + 7;
+
+// Dynamic Programming table.
+// `dp_ways[current_level_idx][start_idx][end_idx]` stores the number of ways
+// to partition the subarray `elements[start_idx...end_idx]` into `current_level_idx` segments
+// satisfying the given condition.
+// The first dimension `[2]` is a space optimization: it alternates between
+// the 'previous' and 'current' level's DP values, avoiding a large 3D array.
+long long dp_ways[2][301][301];
+
+// Indices to keep track of which layer of `dp_ways` holds the 'previous'
+// and 'current' level's computations.
+int prev_level_dp_idx = 0; // Represents the DP results for the 'next' higher level of partitions
+int curr_level_dp_idx = 1; // Represents the DP results for the 'current' level of partitions
+
+/**
+ * @brief Calculates the sum of elements within a given range using prefix sums.
+ *
+ * Overall Idea: This is a standard optimization technique. Instead of summing
+ * elements individually each time, it leverages precomputed prefix sums to
+ * find the sum of any subarray `elements[l...r]` in O(1) time.
+ *
+ * @param start_idx The 1-based starting index of the range.
+ * @param end_idx The 1-based ending index of the range.
+ * @return The sum of elements from `elements[start_idx]` to `elements[end_idx]`.
+ */
+int get_range_sum(int start_idx, int end_idx) {
+    return prefix_sums[end_idx] - prefix_sums[start_idx - 1];
+}
+
+int main() {
+    // Optimize C++ standard streams for faster input/output,
+    // which is crucial in competitive programming.
+    std::ios_base::sync_with_stdio(0);
+    std::cin.tie(0);
+
+    // Read problem parameters: total elements, desired number of partitions, and max allowed difference.
+    std::cin >> N_ELEMENTS >> TARGET_LEVELS >> MAX_DIFF_ALLOWED;
+
+    // Read input elements and compute their prefix sums.
+    // `prefix_sums[i]` stores the sum of elements from index 1 to `i`.
+    for (int i = 1; i <= N_ELEMENTS; ++i) {
+        std::cin >> prefix_sums[i];
+        prefix_sums[i] += prefix_sums[i - 1]; // Accumulate sum
+    }
+
+    // --- Dynamic Programming Initialization (Base Case) ---
+    // Overall Idea: For a single partition (implicitly represented by `prev_level_dp_idx` after this loop),
+    // there is always 1 way to form any continuous subarray `elements[i...j]`.
+    // This forms the foundation for building solutions for more partitions.
+    for (int i = 1; i <= N_ELEMENTS; ++i) {
+        for (int j = i; j <= N_ELEMENTS; ++j) {
+            dp_ways[prev_level_dp_idx][i][j] = 1;
+        }
+    }
+
+    // --- Main Dynamic Programming Calculation ---
+    // Overall Idea: We iterate downwards from `TARGET_LEVELS - 1` partitions down to 1.
+    // For each `current_num_partitions`, we calculate the ways to form segments by
+    // combining solutions from `current_num_partitions + 1` segments (stored in `prev_level_dp_idx`).
+    // This recursive structure allows us to build complex partitions from simpler ones.
+    for (int current_num_partitions = TARGET_LEVELS - 1; current_num_partitions >= 1; --current_num_partitions) {
+        // Initialize the current DP layer (for `current_num_partitions` segments) to zero.
+        for (int i = 1; i <= N_ELEMENTS; ++i) {
+            for (int j = i; j <= N_ELEMENTS; ++j) {
+                dp_ways[curr_level_dp_idx][i][j] = 0;
+            }
+        }
+
+        // Iterate through all possible subarrays [i, j] to partition.
+        for (int i = N_ELEMENTS; i >= 1; --i) {
+            for (int j = i; j <= N_ELEMENTS; ++j) {
+                // Iterate through all possible split points 'k' within the subarray [i, j].
+                // This means we are trying to divide the subarray `elements[i...j]` into two parts:
+                // `elements[i...k]` and `elements[k+1...j]`.
+                for (int k = i; k <= j; ++k) {
+                    // Check the problem-specific condition: absolute difference between the sum
+                    // of the left part and the right part must not exceed `MAX_DIFF_ALLOWED`.
+                    if (std::abs(get_range_sum(i, k) - get_range_sum(k + 1, j)) <= MAX_DIFF_ALLOWED) {
+                        // DP Transition: Add ways to form `current_num_partitions` segments for [i, j].
+                        // This is done by multiplying the ways to partition [i, k] into `current_num_partitions + 1` segments
+                        // with the ways to partition [k+1, j] into `current_num_partitions + 1` segments.
+                        // (The logic implies that `dp[pre]` for `k+1` is for total parts `current_num_partitions+1`
+                        // if you view it as summing up all combinations of sub-parts).
+                        // Note: The problem setup means `dp[pre][i][k]` and `dp[pre][k+1][j]` refer to `current_num_partitions + 1`
+                        // because we're building up from that level.
+                        dp_ways[curr_level_dp_idx][i][j] += (dp_ways[prev_level_dp_idx][i][k] * dp_ways[prev_level_dp_idx][k + 1][j]) % MOD;
+                        dp_ways[curr_level_dp_idx][i][j] %= MOD; // Apply modulo to prevent overflow
+                    }
+                }
+            }
+        }
+
+        // Space Optimization: Swap 'previous' and 'current' indices for the next iteration.
+        // This ensures `prev_level_dp_idx` always points to the results from the `current_num_partitions + 1` level,
+        // and `curr_level_dp_idx` is ready to store results for the `current_num_partitions - 1` level.
+        if (current_num_partitions != 1) { // Avoid swapping on the last iteration if only one level is left.
+            std::swap(prev_level_dp_idx, curr_level_dp_idx);
+        }
+    }
+
+    // Output the final result: The number of ways to partition the entire array `elements[1...N_ELEMENTS]`
+    // into `TARGET_LEVELS` segments, which is stored in `dp_ways[curr_level_dp_idx][1][N_ELEMENTS]`.
+    std::cout << dp_ways[curr_level_dp_idx][1][N_ELEMENTS] << '\n';
+
+    return 0; // Indicate successful program execution
+}

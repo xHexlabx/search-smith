@@ -1,0 +1,115 @@
+#include <iostream>   // For input/output operations (cin, cout)
+#include <vector>     // For dynamic arrays (std::vector)
+#include <queue>      // For BFS queue (std::queue)
+#include <algorithm>  // For general algorithms (like std::min, std::max, not directly used here but common)
+
+// Use 'long long' for calculations involving large numbers to prevent overflow,
+// especially with factorials and modulo arithmetic.
+using ll = long long;
+
+// Modulo value for all arithmetic operations to keep results within bounds.
+const int MOD = 1e9 + 7;
+
+/**
+ * @brief Precomputes factorials up to 'n' modulo MOD.
+ *
+ * Overall Idea: Factorials (n!) are frequently used in combinatorics for
+ * counting permutations. Precomputing them allows for O(1) lookup during
+ * the main calculation, improving efficiency.
+ *
+ * @param factorials_array A reference to the vector that will store precomputed factorials.
+ * @param max_val The maximum number up to which factorials need to be computed.
+ */
+void precompute_factorials(std::vector<ll>& factorials_array, int max_val) {
+    factorials_array[0] = 1; // Base case: 0! = 1
+    factorials_array[1] = 1; // Base case: 1! = 1
+    for (int i = 2; i <= max_val; ++i) {
+        factorials_array[i] = (factorials_array[i - 1] * i) % MOD;
+    }
+}
+
+int main() {
+    // Optimize C++ standard streams for faster input/output,
+    // which is a standard practice in competitive programming.
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+    // cout.tie(NULL); // Often not needed unless mixing cin/cout heavily or for specific judging systems.
+
+    int num_nodes; // Total number of nodes in the graph (tree).
+    std::cin >> num_nodes;
+
+    // 'record_sequence' stores the input sequence of node visits.
+    // This sequence implicitly defines the edges of the tree/graph structure
+    // that needs to be traversed. For N nodes, an Euler tour of a tree has 2N-1 elements.
+    std::vector<int> record_sequence(2 * num_nodes - 1);
+    for (int i = 0; i < 2 * num_nodes - 1; ++i) {
+        std::cin >> record_sequence[i];
+    }
+
+    // Precompute factorials up to 'num_nodes' for later permutation calculations.
+    std::vector<ll> factorials(num_nodes + 1);
+    precompute_factorials(factorials, num_nodes);
+
+    // 'adj_list' represents the graph (tree) using an adjacency list.
+    // Overall Idea: It stores the direct neighbors for each node. The input
+    // `record_sequence` provides pairs `(rec[i], rec[i+1])` which are connected.
+    // Although only one direction is explicitly added here (`rec[i] -> rec[i+1]`),
+    // the problem's input format for `record_sequence` ensures that all necessary
+    // connections for an undirected traversal are implicitly established.
+    std::vector<std::vector<int>> adj_list(num_nodes + 1);
+    for (int i = 0; i <= 2 * num_nodes - 3; ++i) { // Iterate through all consecutive pairs in the sequence.
+        adj_list[record_sequence[i]].push_back(record_sequence[i + 1]);
+    }
+
+    // --- BFS-like Traversal and Permutation Counting ---
+    // Overall Idea: The problem asks for the number of ways to traverse the structure.
+    // This is calculated by starting a BFS from the first node in `record_sequence`.
+    // At each node, we count its *unvisited* neighbors. The number of ways to pick
+    // the next node from these unvisited neighbors is `(count of unvisited neighbors)!`.
+    // These factorial counts are multiplied together for each node processed in BFS.
+    // `visited_nodes` ensures each node is processed only once.
+
+    int start_node = record_sequence[0]; // The starting point of the exploration.
+    std::vector<bool> visited_nodes(num_nodes + 1, false); // Tracks which nodes have been processed.
+    std::queue<int> bfs_queue; // Queue for the BFS traversal.
+    ll total_traversal_permutations = 1; // Accumulates the product of factorial counts.
+
+    // Process the starting node first.
+    visited_nodes[start_node] = true;
+    int unvisited_branches_at_start = 0;
+    for (int neighbor : adj_list[start_node]) {
+        if (!visited_nodes[neighbor]) { // If a neighbor hasn't been processed yet.
+            bfs_queue.push(neighbor); // Add to queue for future processing.
+            unvisited_branches_at_start++; // Count as an unvisited branch.
+        }
+    }
+    // Multiply by the factorial of unvisited branches from the start node.
+    total_traversal_permutations = (total_traversal_permutations * factorials[unvisited_branches_at_start]) % MOD;
+
+    // Continue the BFS traversal.
+    while (!bfs_queue.empty()) {
+        int current_node = bfs_queue.front();
+        bfs_queue.pop();
+
+        // Process the current node ONLY if it hasn't been processed yet.
+        // A node might be added to the queue multiple times if it's a neighbor of
+        // several already processed nodes, but its counting logic should run once.
+        if (!visited_nodes[current_node]) {
+            visited_nodes[current_node] = true; // Mark as processed.
+            int unvisited_branches_at_current = 0;
+            for (int neighbor : adj_list[current_node]) {
+                if (!visited_nodes[neighbor]) { // If a neighbor hasn't been processed yet.
+                    bfs_queue.push(neighbor);
+                    unvisited_branches_at_current++;
+                }
+            }
+            // Multiply by the factorial of unvisited branches from the current node.
+            total_traversal_permutations = (total_traversal_permutations * factorials[unvisited_branches_at_current]) % MOD;
+        }
+    }
+
+    // Output the final calculated number of distinct traversal permutations.
+    std::cout << total_traversal_permutations << '\n';
+
+    return 0; // Indicate successful program execution.
+}

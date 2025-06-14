@@ -1,0 +1,128 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <limits> // Required for numeric_limits
+
+// Represents an edge in the graph with a destination vertex and a weight.
+struct Edge {
+    int to;
+    int weight;
+};
+
+// Represents a state in the priority queue for Dijkstra's algorithm.
+// It stores the current vertex and the accumulated weight to reach it.
+// The operator< is overloaded to create a min-priority queue based on weight.
+struct State {
+    int vertex;
+    int weight;
+
+    bool operator<(const State& other) const {
+        return other.weight < weight; // For min-priority queue
+    }
+};
+
+const int MAX_MASK_NODES = (1 << 19); // Maximum number of mask nodes (2^19)
+const int MAX_TOTAL_NODES = MAX_MASK_NODES + 90001; // Total nodes including item nodes
+
+std::vector<Edge> adjacency_list[MAX_TOTAL_NODES]; // Adjacency list for the graph
+int distances[MAX_TOTAL_NODES]; // Stores the shortest distance from the source to each node
+
+int main() {
+    // Optimize C++ standard streams for competitive programming.
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+
+    int num_items; // Represents 'n' in the original code, number of item nodes.
+    int num_bits;  // Represents 's' in the original code, number of bits in the mask.
+
+    std::cin >> num_items >> num_bits;
+
+    // Initialize distances to all nodes as infinity.
+    for (int i = 0; i < MAX_MASK_NODES + num_items; ++i) {
+        distances[i] = std::numeric_limits<int>::max();
+    }
+
+    // Create edges between mask nodes.
+    // A mask node 'mask + num_items' (offset by num_items) can transition to
+    // 'mask ^ (1 << i) + num_items' with weight 0, representing flipping the i-th bit.
+    for (int mask = 0; mask < MAX_MASK_NODES; ++mask) {
+        for (int i = 0; i < num_bits; ++i) {
+            int bit_val = (1 << i);
+            if (mask & bit_val) { // If the i-th bit is set in the mask
+                // Add an edge for flipping the bit
+                adjacency_list[mask + num_items].push_back({(mask ^ bit_val) + num_items, 0});
+            }
+        }
+    }
+
+    // Process item specific connections.
+    // Each item has a source mask and a destination mask, with an associated weight.
+    // It also connects the source mask to the item node itself with weight 0.
+    for (int i = 0; i < num_items; ++i) {
+        int item_weight;
+        int source_mask = 0;
+        int destination_mask = 0;
+
+        std::cin >> item_weight;
+
+        for (int j = 0; j < num_bits; ++j) {
+            int bit_status; // -1 for source bit, 1 for destination bit, 0 for don't care
+            std::cin >> bit_status;
+
+            if (bit_status == -1) {
+                source_mask |= (1 << j); // Set j-th bit in source mask
+            }
+            if (bit_status == 1) {
+                destination_mask |= (1 << j); // Set j-th bit in destination mask
+            }
+        }
+
+        // Add an edge from the source mask node to the destination mask node with the item's weight.
+        adjacency_list[source_mask + num_items].push_back({destination_mask + num_items, item_weight});
+        // Add an edge from the source mask node to the item node itself with weight 0.
+        // This allows reaching the item node from its associated source mask.
+        adjacency_list[source_mask + num_items].push_back({i, 0});
+    }
+
+    // Dijkstra's algorithm to find shortest paths.
+    // Start from the "empty mask" node, which is at index `num_items` (0 + num_items).
+    distances[num_items] = 0;
+    std::priority_queue<State> pq;
+    pq.push({num_items, 0});
+
+    while (!pq.empty()) {
+        State current_state = pq.top();
+        pq.pop();
+
+        int current_vertex = current_state.vertex;
+        int current_distance = current_state.weight;
+
+        // If we found a shorter path to this vertex already, skip.
+        if (current_distance > distances[current_vertex]) {
+            continue;
+        }
+
+        // Explore neighbors.
+        for (const auto& edge : adjacency_list[current_vertex]) {
+            int neighbor_vertex = edge.to;
+            int edge_weight = edge.weight;
+
+            if (current_distance + edge_weight < distances[neighbor_vertex]) {
+                distances[neighbor_vertex] = current_distance + edge_weight;
+                pq.push({neighbor_vertex, distances[neighbor_vertex]});
+            }
+        }
+    }
+
+    // Find the maximum shortest distance among all item nodes.
+    int max_shortest_distance = 0;
+    for (int i = 0; i < num_items; ++i) {
+        if (distances[i] != std::numeric_limits<int>::max()) {
+            max_shortest_distance = std::max(max_shortest_distance, distances[i]);
+        }
+    }
+
+    std::cout << max_shortest_distance << std::endl;
+
+    return 0;
+}

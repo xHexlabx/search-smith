@@ -1,0 +1,85 @@
+#include <iostream>
+#include <vector>
+#include <algorithm> // Required for std::sort, std::reverse, std::upper_bound
+
+// Represents a mountain with a left coordinate (l), right coordinate (r), and original index.
+// The custom comparison operator allows sorting mountains first by 'l' in ascending order,
+// and then by 'r' in descending order if 'l' values are equal.
+struct Mountain {
+    int left_coord;
+    int right_coord;
+    int original_index;
+
+    // Custom comparison for sorting:
+    // Sort by left_coord ascending, then by right_coord descending.
+    bool operator<(const Mountain& other) const {
+        if (left_coord != other.left_coord) {
+            return left_coord < other.left_coord;
+        }
+        return right_coord > other.right_coord;
+    }
+};
+
+int main() {
+    // Optimize C++ standard streams for competitive programming.
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+
+    int num_mountains;
+    std::cin >> num_mountains;
+
+    std::vector<Mountain> mountains(num_mountains);
+    for (int i = 0; i < num_mountains; ++i) {
+        std::cin >> mountains[i].left_coord >> mountains[i].right_coord;
+        mountains[i].original_index = i;
+    }
+
+    // Sort mountains based on the custom comparison operator.
+    std::sort(mountains.begin(), mountains.end());
+
+    // Reverse the sorted order. This means mountains are now sorted by 'l' descending,
+    // and then by 'r' ascending if 'l' values are equal.
+    std::reverse(mountains.begin(), mountains.end());
+
+    std::vector<int> longest_non_decreasing_subsequence_tails; // Stores the tails of LNDS of increasing lengths
+    std::vector<int> result_lnds_lengths(num_mountains); // Stores the LNDS length for each original mountain
+    int max_overall_lnds_length = 0;
+
+    // Iterate through the sorted (and reversed) mountains to find the LNDS.
+    for (int i = 0; i < num_mountains; ++i) {
+        int current_right_coord = mountains[i].right_coord;
+
+        // Find the first element in 'longest_non_decreasing_subsequence_tails' that is strictly greater than 'current_right_coord'.
+        // This is a key step in finding LNDS in O(N log N) time.
+        auto it = std::upper_bound(longest_non_decreasing_subsequence_tails.begin(),
+                                   longest_non_decreasing_subsequence_tails.end(),
+                                   current_right_coord);
+
+        if (it == longest_non_decreasing_subsequence_tails.end()) {
+            // If 'current_right_coord' is greater than all elements in 'longest_non_decreasing_subsequence_tails',
+            // it extends the longest non-decreasing subsequence found so far.
+            longest_non_decreasing_subsequence_tails.push_back(current_right_coord);
+            result_lnds_lengths[mountains[i].original_index] = longest_non_decreasing_subsequence_tails.size();
+        } else {
+            // Otherwise, replace the found element with 'current_right_coord'.
+            // This maintains the property that 'longest_non_decreasing_subsequence_tails' stores
+            // the smallest tail for each possible LNDS length.
+            *it = current_right_coord;
+            result_lnds_lengths[mountains[i].original_index] = std::distance(longest_non_decreasing_subsequence_tails.begin(), it) + 1;
+        }
+
+        // Update the maximum overall LNDS length found.
+        max_overall_lnds_length = std::max(max_overall_lnds_length, result_lnds_lengths[mountains[i].original_index]);
+    }
+
+    // Output the maximum LNDS length.
+    std::cout << max_overall_lnds_length << '\n';
+
+    // Output the LNDS length for each mountain in their original input order.
+    for (int i = 0; i < num_mountains; ++i) {
+        std::cout << result_lnds_lengths[i] << ' ';
+    }
+    std::cout << '\n';
+
+    return 0;
+}

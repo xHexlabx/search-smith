@@ -1,0 +1,206 @@
+#include <iostream>   // For standard input/output operations (cin, cout)
+#include <vector>     // For std::vector dynamic arrays
+#include <algorithm>  // For std::sort (though not explicitly used for sorting here as input is read in order)
+#include <limits>     // For std::numeric_limits<long long>::min/max (LLONG_MIN/MAX)
+
+// DEBUG macro to include/exclude debug printing. Set to 0 for production.
+#define DEBUG_MODE 0
+
+// Using 'long long' for all coordinate and sum values to prevent overflow,
+// as values like 1e9 and their products can exceed int limits.
+using ll = long long;
+
+// These vectors will store the input coordinates and their corresponding values.
+// They are global for ease of access in helper functions, common in competitive programming.
+std::vector<ll> x_coordinates;
+std::vector<ll> y_coordinates;
+
+// These vectors store the prefix sums of values associated with x and y coordinates.
+// `x_value_prefix_sums[i]` is the sum of values up to `x_coordinates[i]`.
+std::vector<ll> x_value_prefix_sums;
+std::vector<ll> y_value_prefix_sums;
+
+/**
+ * @brief Calculates the sum of values from x_coordinates data up to a given threshold.
+ *
+ * Overall Idea: This function efficiently finds the sum of all `s` values whose
+ * corresponding `x_coordinates` are less than or equal to `target_threshold`.
+ * It uses a binary search to locate the relevant index in the sorted `x_coordinates`
+ * and then retrieves the sum from the precomputed `x_value_prefix_sums`.
+ *
+ * @param target_threshold The upper bound for the x-coordinate.
+ * @return The sum of values `s` for `x_coordinates <= target_threshold`.
+ */
+ll get_sum_from_x_data(ll target_threshold) {
+    // Binary search to find the largest index `idx` such that `x_coordinates[idx] <= target_threshold`.
+    // The sentinels (LLONG_MIN/MAX) simplify boundary conditions for binary search.
+    int low = 0, high = x_coordinates.size() - 1, mid_idx;
+    int found_idx = 0; // Default to the sentinel index
+
+    while (low <= high) {
+        mid_idx = low + (high - low) / 2; // Avoids potential overflow with (low+high)/2
+        if (x_coordinates[mid_idx] <= target_threshold) {
+            found_idx = mid_idx; // This index is a candidate
+            low = mid_idx + 1;   // Try to find a larger index
+        } else {
+            high = mid_idx - 1; // Look in the left half
+        }
+    }
+    // Return the prefix sum up to the found index.
+    return x_value_prefix_sums[found_idx];
+}
+
+/**
+ * @brief Calculates the sum of values from y_coordinates data based on a transformed threshold.
+ *
+ * Overall Idea: Similar to `get_sum_from_x_data`, but applies a linear transformation
+ * `(y_coordinate * a + b)` to each y-coordinate. It then finds the sum of all `t` values
+ * whose transformed `y_coordinates` are less than or equal to `target_threshold`.
+ *
+ * @param target_threshold The upper bound for the transformed y-coordinate.
+ * @param val_a Coefficient 'a' for the transformation `a*y + b`.
+ * @param val_b Constant 'b' for the transformation `a*y + b`.
+ * @return The sum of values `t` for `(y_coordinate * val_a + val_b) <= target_threshold`.
+ */
+ll get_sum_from_y_data(ll target_threshold, ll val_a, ll val_b) {
+    // Binary search to find the largest index `idx` such that `y_coordinates[idx] * val_a + val_b <= target_threshold`.
+    int low = 0, high = y_coordinates.size() - 1, mid_idx;
+    int found_idx = 0; // Default to the sentinel index
+
+    while (low <= high) {
+        mid_idx = low + (high - low) / 2;
+        // Apply the transformation before comparison
+        if (y_coordinates[mid_idx] * val_a + val_b <= target_threshold) {
+            found_idx = mid_idx;
+            low = mid_idx + 1;
+        } else {
+            high = mid_idx - 1;
+        }
+    }
+    // Return the prefix sum up to the found index.
+    return y_value_prefix_sums[found_idx];
+}
+
+int main() {
+    // Optimize C++ standard streams for faster input/output.
+    // This is a common practice in competitive programming.
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+
+    int num_x_elements, num_y_elements, num_queries;
+    std::cin >> num_x_elements >> num_y_elements >> num_queries;
+
+    // --- Data Initialization ---
+    // Overall Idea: Initialize coordinate vectors and their prefix sum vectors.
+    // Sentinel values (LLONG_MIN/MAX) are pushed to simplify binary search
+    // boundary conditions: they ensure `found_idx` always points to a valid position.
+    x_coordinates.push_back(std::numeric_limits<ll>::min()); // Sentinel for x_coordinates
+    y_coordinates.push_back(std::numeric_limits<ll>::min()); // Sentinel for y_coordinates
+
+    x_value_prefix_sums.push_back(0); // Corresponding sentinel sum for x_coordinates
+    y_value_prefix_sums.push_back(0); // Corresponding sentinel sum for y_coordinates
+
+    // Read X-coordinates and add a sentinel at the end.
+    for (int i = 0; i < num_x_elements; ++i) {
+        ll val;
+        std::cin >> val;
+        x_coordinates.push_back(val);
+    }
+    x_coordinates.push_back(std::numeric_limits<ll>::max()); // Sentinel for x_coordinates
+
+    // Read values associated with X-coordinates and add a sentinel at the end.
+    // These will be used to compute prefix sums.
+    for (int i = 0; i < num_x_elements; ++i) {
+        ll val;
+        std::cin >> val;
+        x_value_prefix_sums.push_back(val);
+    }
+    x_value_prefix_sums.push_back(0); // Sentinel for sums (will be ignored by prefix sum loop)
+
+    // Read Y-coordinates and add a sentinel at the end.
+    for (int i = 0; i < num_y_elements; ++i) {
+        ll val;
+        std::cin >> val;
+        y_coordinates.push_back(val);
+    }
+    y_coordinates.push_back(std::numeric_limits<ll>::max()); // Sentinel for y_coordinates
+
+    // Read values associated with Y-coordinates and add a sentinel at the end.
+    for (int i = 0; i < num_y_elements; ++i) {
+        ll val;
+        std::cin >> val;
+        y_value_prefix_sums.push_back(val);
+    }
+    y_value_prefix_sums.push_back(0); // Sentinel for sums
+
+    // --- Prefix Sum Computation ---
+    // Overall Idea: Transform the raw value arrays into prefix sum arrays.
+    // This allows `get_sum_from_x_data` and `get_sum_from_y_data` to query
+    // sums of ranges efficiently (in O(1) time after binary search finds the index).
+    for (size_t i = 1; i < x_value_prefix_sums.size(); ++i) {
+        x_value_prefix_sums[i] += x_value_prefix_sums[i - 1];
+    }
+
+    for (size_t i = 1; i < y_value_prefix_sums.size(); ++i) {
+        y_value_prefix_sums[i] += y_value_prefix_sums[i - 1];
+    }
+
+    // --- Query Processing ---
+    // Overall Idea: For each query (a, b, k), perform a binary search on the
+    // possible answer space (the threshold value `L`). The search range is
+    // typically defined by problem constraints (here, `[-1e9, 1e9]`).
+    // The check function inside the binary search is `get_sum_from_x_data(mid) + get_sum_from_y_data(mid)`.
+    for (int q_idx = 0; q_idx < num_queries; ++q_idx) {
+        ll query_a, query_b, query_k;
+        std::cin >> query_a >> query_b >> query_k;
+
+        // Binary search for the minimum `L` that satisfies the condition.
+        // `low` is the smallest possible answer, `high` is the largest.
+        ll search_low = -2e9 - 7; // Wider range to ensure -1e9 is covered and handles edge cases
+        ll search_high = 2e9 + 7; // Wider range
+        ll result_L = search_high; // Initialize with a value outside the valid range, or a sufficiently large one
+
+        while (search_low <= search_high) {
+            ll current_mid = search_low + (search_high - search_low) / 2;
+
+            // Calculate the combined count for the current `mid` value.
+            ll combined_count = get_sum_from_x_data(current_mid) + get_sum_from_y_data(current_mid, query_a, query_b);
+
+            // Binary search decision:
+            // If the combined count is sufficient (>= k), then `current_mid` *could* be the answer,
+            // or a smaller value might also work. So, we try the left half.
+            if (combined_count >= query_k) {
+                result_L = current_mid; // `current_mid` is a possible answer
+                search_high = current_mid - 1; // Try to find a smaller `L`
+            } else {
+                // If the combined count is not enough (< k), `current_mid` is too small.
+                // We need a larger `L`, so try the right half.
+                search_low = current_mid + 1;
+            }
+        }
+        // `result_L` will hold the smallest `L` that satisfies the condition.
+        std::cout << result_L << '\n';
+    }
+
+    // --- Debugging Block (Optional) ---
+    // Overall Idea: This block is useful for verifying intermediate data structures
+    // during development. It's typically guarded by a `DEBUG_MODE` macro
+    // so it doesn't affect production builds.
+    if (DEBUG_MODE) {
+        std::cout << "DEBUG INFO:\n";
+        std::cout << "X Coordinates: ";
+        for (ll val : x_coordinates) std::cout << val << ' ';
+        std::cout << '\n';
+        std::cout << "X Prefix Sums: ";
+        for (ll val : x_value_prefix_sums) std::cout << val << " ";
+        std::cout << '\n';
+        std::cout << "Y Coordinates: ";
+        for (ll val : y_coordinates) std::cout << val << ' ';
+        std::cout << '\n';
+        std::cout << "Y Prefix Sums: ";
+        for (ll val : y_value_prefix_sums) std::cout << val << " ";
+        std::cout << '\n';
+    }
+
+    return 0; // Indicate successful program execution
+}
