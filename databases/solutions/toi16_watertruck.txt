@@ -1,0 +1,203 @@
+#include <bits/stdc++.h>
+
+#define ll long long
+
+#define pii pair<int,int>
+
+using namespace std;
+
+int n, m, sum = 0, cnt = 0;
+
+int keep[100001];
+
+vector<pair<int,int>> vec[100001];
+
+vector<int> odd;
+
+int dis[105][100001];
+
+int func( int temp )
+
+{
+
+    int pro[100001] = {};
+
+    priority_queue<pii, vector<pii>, greater<pii>> pq;
+
+    dis[temp][odd[temp]] = 0;
+
+    pq.push( {dis[temp][odd[temp]], odd[temp]} );
+
+    while( !pq.empty() )
+
+    {
+
+        int sec = pq.top().second;
+
+        pq.pop();
+
+        if( !pro[sec] )
+
+        {
+
+            pro[sec] = 1;
+
+            for( auto [x, y] : vec[sec] )
+
+            {
+
+                if( !pro[y] )
+
+                {
+
+                    dis[temp][y] = min( dis[temp][y], dis[temp][sec]+x );
+
+                    pq.push( {dis[temp][y], y} );
+
+                }
+
+            }
+
+        }
+
+    }
+
+    return 0;
+
+}
+
+int main()
+
+{
+
+    ios_base::sync_with_stdio(0);cin.tie(0);
+
+    cin >> n >> m;
+
+    for( int i=0;i<n;i++ )
+
+    {
+
+        int u, v, w;
+
+        cin >> u >> v >> w;
+
+        keep[u]++;
+
+        keep[v]++;
+
+        sum += w;
+
+        vec[u].push_back( {w, v} );
+
+        vec[v].push_back( {w, u} );
+
+    }
+
+    for( int i=0;i<=m;i++ ) cnt += keep[i]%2;
+
+    if( cnt == 0 )
+
+    {
+
+        cout << sum;
+
+        return 0;
+
+    }
+
+    do
+
+    {
+
+        for( int i=0;i<=m;i++ )
+
+        {
+
+            if( keep[i] == 1 )
+
+            {
+
+                keep[i] = 0;
+
+                for( auto [f, s] : vec[i] )
+
+                {
+
+                    if( keep[s] > 0 )
+
+                    {
+
+                        keep[s]--;
+
+                        sum += f;
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        cnt = 0;
+
+        for( int i=0;i<=m;i++ ) cnt += (keep[i] == 1);
+
+    }while( cnt > 0 );
+
+    cnt = 0;
+
+    for( int i=0;i<=m;i++ )
+
+    {
+
+        if( keep[i]%2 == 1 )
+
+        {
+
+            odd.push_back(i);
+
+            cnt++;
+
+        }
+
+    }
+
+    if( cnt == 0 )
+
+    {
+
+        cout << sum;
+
+        return 0;
+
+    }
+
+    for( int i=0;i<cnt;i++ ) for( int j=0;j<=m;j++ ) dis[i][j] = INT_MAX;
+
+    func( 0 );
+
+    if( cnt == 2 )
+
+    {
+
+        sum += dis[0][odd[1]];
+
+        cout << sum;
+
+        return 0;
+
+    }
+
+    func(1);
+
+    func(2);
+
+    sum += min( { dis[0][odd[1]]+dis[2][odd[3]], dis[0][odd[2]]+dis[1][odd[3]], dis[0][odd[3]]+dis[1][odd[2]] } );
+
+    cout << sum;
+
+    return 0;
+
+}

@@ -1,0 +1,200 @@
+#include <bits/stdc++.h>
+
+
+using namespace std;
+
+
+int Z, K, N;
+
+
+bool coprimes[1000001];
+
+int prefix[1000001];
+
+int suffix[1000001];
+
+
+vector<int> get_prime_factor(int z) {
+
+    vector<int> ans;
+
+    bool notprime[z+1] = {false};
+
+    notprime[0] = true;
+
+    notprime[1] = true;
+
+    if (z % 2 == 0) {
+
+        ans.push_back(2);
+
+    }
+
+    for (int i = 3; i <= z; i += 2) {
+
+        if ((z % i == 0) && !notprime[i]) {
+
+            ans.push_back(i);
+
+            for (int j = i; j <= z; j += i) notprime[j] = true;
+
+        }
+
+    }
+
+    return ans;
+
+}
+
+
+int main1() {
+
+    vector<int> K_prime_facts;
+
+    K_prime_facts = get_prime_factor(K);
+
+    bool pos_neg[K+1] = {false}; // false - true +
+
+    for (int i : K_prime_facts) for (int j = i; j <= K; j += i) pos_neg[j] = true;
+
+    int charge_qc[K+1];
+
+    charge_qc[0] = 0;
+
+    for (int i = 1; i <= K; i++) {
+
+        if (pos_neg[i]) charge_qc[i] = charge_qc[i-1] + 1;
+
+        else charge_qc[i] = charge_qc[i-1] - 1;
+
+    }
+
+    int mnl = 2147483647, mxl = -2147483647, mnr = 2147483647, mxr = -2147483647;
+
+    for (int i = 0; i < N; i++) {
+
+        int A;
+
+        cin >> A;
+
+        int qc = A/K * charge_qc[K] + charge_qc[A%K];
+
+        //cout << qc << "\n";
+
+        mnr = min(mnr, qc);
+
+        mxr = max(mxr, qc);
+
+        A--;
+
+        qc = A/K * charge_qc[K] + charge_qc[A%K];
+
+        mnl = min(mnl, qc);
+
+        mxl = max(mxl, qc);
+
+    }
+
+    cout << max(mxr - mnl, mxl - mnr);
+
+    return 0;
+
+}
+
+
+vector<int> get_prime_factor2(int z) {
+
+    vector<int> ans;
+
+    bool notprime[z+1] = {false};
+
+    notprime[0] = true;
+
+    notprime[1] = true;
+
+    if (z % 2 == 0) {
+
+        ans.push_back(2);
+
+        while (z % 2 == 0) z = z >> 1;
+
+    }
+
+    for (int i = 3; i <= z; i += 2) {
+
+        if ((z % i == 0) && !notprime[i]) {
+
+            ans.push_back(i);
+
+            while (z % i == 0) z /= i;
+
+            for (int j = i; j <= z; j += i) notprime[j] = true;
+
+        }
+
+    }
+
+    return ans;
+
+}
+
+
+int main() {
+
+    ios_base::sync_with_stdio(false);
+
+    cin.tie(NULL);
+
+    cin >> Z >> K >> N;
+
+    if (N <= 100) {
+
+        main1();
+
+        return 0;
+
+    }
+
+    vector<int> K_prime_facts;
+
+    K_prime_facts = get_prime_factor2(K);
+
+    bool pos_neg[K+1] = {false}; // false - true +
+
+    for (int i : K_prime_facts) for (int j = i; j <= K; j += i) pos_neg[j] = true;
+
+    int charge_qc[K+1];
+
+    charge_qc[0] = 0;
+
+    for (int i = 1; i <= K; i++) {
+
+        if (pos_neg[i]) charge_qc[i] = charge_qc[i-1] + 1;
+
+        else charge_qc[i] = charge_qc[i-1] - 1;
+
+    }
+
+    int mn = 2147483647, mx = -2147483647;
+
+    for (int i = 0; i < N; i++) {
+
+        int A;
+
+        cin >> A;
+
+        int qc = A/K * charge_qc[K] + charge_qc[A%K];
+
+        //cout << qc << "\n";
+
+        mn = min(mn, qc);
+
+        mx = max(mx, qc);
+
+    }
+
+    cout << mx - mn + 1;
+
+    return 0;
+
+}

@@ -1,0 +1,65 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+
+#define int long long
+
+const int N = 400+9;
+
+const int INF = 1e18;
+
+
+int k,n;
+
+int ans = 0;
+
+int v[N];
+
+int dp[N][N];
+
+
+void solve(){
+
+	int cnt=0;
+
+	cin >> n;for(int i=1;i<=n;i++)for(int j=1;j<=n;j++)dp[i][j]=INF;
+
+	for(int i=1;i<=n;i++)cin >> v[i],dp[i][i]=1;
+
+	for(int len=2;len<=n;len++){
+
+		for(int l=1;l+len-1<=n;l++){
+
+			int r=l+len-1;
+
+			for(int k=l;k<r;k++){
+
+				dp[l][r] = min(dp[l][r],dp[l][k]+dp[k+1][r]);//หยิบตัวที่ k ออก
+
+			}
+
+			if(v[l]==v[r])dp[l][r]--;
+
+		}
+
+	}
+
+	ans = max(ans,dp[1][n]);
+
+}
+
+
+int32_t main(){
+
+	cin.tie(nullptr)->sync_with_stdio(false);
+
+	int q;cin >> q >> k;
+
+	while(q--)solve();
+
+	cout << ans << "\n";
+
+	return 0;
+
+}

@@ -1,0 +1,137 @@
+#include <iostream>
+
+
+#include <algorithm>
+
+
+#include <cstdint>
+
+
+
+const int INF = 5001;
+
+
+const int MAXN = 2000005;
+
+
+const int MAX_SEG = 1000;
+
+
+
+int x[MAXN];
+
+
+int dp[MAXN];
+
+
+int64_t odd_ps[MAXN];
+
+
+int64_t even_ps[MAXN];
+
+
+
+int main() {
+
+
+    std::ios_base::sync_with_stdio(false);
+
+
+    std::cin.tie(nullptr);
+
+
+
+    int N;
+
+
+    int64_t V, W;
+
+
+    std::cin >> N >> V >> W;
+
+
+
+    for (int i = 0; i < N; ++i) std::cin >> x[i];
+
+
+
+    for (int i = 0; i < N; ++i) {
+
+
+        odd_ps[i + 1] = odd_ps[i];
+
+
+        even_ps[i + 1] = even_ps[i];
+
+
+        if (x[i] & 1) odd_ps[i + 1] += x[i];
+
+
+        else even_ps[i + 1] += x[i];
+
+
+    }
+
+
+
+    std::fill(dp, dp + N + 1, INF);
+
+
+    dp[0] = 0;
+
+
+
+    for (int i = 2; i <= N; i += 2) {
+
+
+        int best = INF;
+
+
+        int max_len = std::min(i, MAX_SEG * 2);
+
+
+
+        for (int len = 2; len <= max_len; len += 2) {
+
+
+            int j = i - len;
+
+
+            if (dp[j] == INF) continue;
+
+
+
+            int mid = j + (len >> 1);
+
+
+            int64_t a = odd_ps[mid] - odd_ps[j];
+
+
+            int64_t b = even_ps[i] - even_ps[mid];
+
+
+
+            if (a > V || b > W) continue;
+
+
+
+            best = std::min(best, dp[j] + 1);
+
+
+        }
+
+
+        dp[i] = best;
+
+
+    }
+
+
+
+    std::cout << (dp[N] == INF ? -1 : dp[N]) << '\n';
+
+
+    return 0;
+
+
+}

@@ -1,0 +1,62 @@
+
+#include <bits/stdc++.h>
+
+using namespace std;
+
+
+#define int long long
+
+const int N = 9+2;
+
+
+int n,t,ans;
+
+string s[N];
+
+int lcms[N];
+
+
+void solve(int cur,int idx){
+
+	if(cur==n+1){
+
+		ans=min(ans,idx);
+
+		return ;
+
+	}
+
+	if(idx>ans)return;
+
+	for(int i=idx;i<=lcms[cur];i+=lcms[cur-1]){
+
+		if(s[cur][i%s[cur].size()]-'0'==t)solve(cur+1,i);
+
+	}
+
+}
+
+
+int32_t main(){
+
+	cin.tie(nullptr)->sync_with_stdio(false);
+
+	cin >> n >> t;lcms[0] = 1;
+
+	for(int i=1;i<=n;i++){
+
+		cin >> s[i];
+
+		int len = s[i].size();
+
+		lcms[i] = lcms[i-1]*len/__gcd(len,lcms[i-1]);
+
+	}
+
+	ans = lcms[n];solve(1,1);
+
+	cout << ans << "\n";
+
+	return 0;
+
+}
