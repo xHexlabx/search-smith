@@ -1,0 +1,129 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+
+const int nx=4*1e4+7;
+
+int n,m;
+
+int up[nx];
+
+int down[nx];
+
+int leftt[nx];
+
+int rightt[nx];
+
+int stx=nx,sty=nx;
+
+int arr[607][607];
+
+bool vis[607][607];
+
+
+int main(){
+
+    cin>>n>>m;
+
+    int k=n*m-1;
+
+    for(int i=0;i<=n*m;i++){
+
+        up[i]=down[i]=leftt[i]=rightt[i]=-1;
+
+    }
+
+    for(int i=1;i<=k;i++){
+
+        int a,b;
+
+        char c;
+
+        cin>>a>>c>>b;
+
+        if(c=='U'){
+
+            up[b]=a;
+
+            down[a]=b;
+
+        }
+
+        if(c=='L'){
+
+            leftt[b]=a;
+
+            rightt[a]=b;
+
+        }
+
+    }
+
+    queue<pair<int,pair<int,int>>> q;
+
+    q.push({0,{200,200}});
+
+    while(!q.empty()){
+
+        int cur=q.front().first;
+
+        int curi=q.front().second.first;
+
+        int curj=q.front().second.second;
+
+        q.pop();
+
+        if(vis[curi][curj]){
+
+            continue;
+
+        }
+
+        vis[curi][curj]=1;
+
+        stx=min(stx,curj);
+
+        sty=min(sty,curi);
+
+        arr[curi][curj]=cur;
+
+        if(up[cur]!=-1){
+
+            q.push({up[cur],{curi-1,curj}});
+
+        }
+
+        if(down[cur]!=-1){
+
+            q.push({down[cur],{curi+1,curj}});
+
+        }
+
+        if(rightt[cur]!=-1){
+
+            q.push({rightt[cur],{curi,curj+1}});
+
+        }
+
+        if(leftt[cur]!=-1){
+
+            q.push({leftt[cur],{curi,curj-1}});
+
+        }
+
+    }
+
+    for(int i=0;i<n;i++){
+
+        for(int j=0;j<m;j++){
+
+            cout<<arr[sty+i][stx+j]<<' ';
+
+        }
+
+        cout<<'\n';
+
+    }
+
+}

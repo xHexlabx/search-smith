@@ -1,0 +1,569 @@
+#include<bits/stdc++.h>
+
+using namespace std;
+
+int main(){
+
+    cin.tie(NULL)->sync_with_stdio(false);
+
+    int n,m,i,j,c=0,I,J;
+
+    char a,b;
+
+    cin >> n >> m;
+
+    vector<pair<char,char>> song[32];
+
+    song[11].push_back({'A','W'});
+
+    song[11].push_back({'W','A'});
+
+    song[12].push_back({'D','W'});
+
+    song[12].push_back({'W','D'});
+
+    song[13].push_back({'A','S'});
+
+    song[13].push_back({'S','A'});
+
+    song[14].push_back({'D','S'});
+
+    song[14].push_back({'S','D'});
+
+    song[21].push_back({'S','W'});
+
+    song[21].push_back({'W','S'});
+
+    song[22].push_back({'D','A'});
+
+    song[22].push_back({'A','D'});
+
+    song[31].push_back({'S','W'});
+
+    song[31].push_back({'W','S'});
+
+    song[31].push_back({'D','A'});
+
+    song[31].push_back({'A','D'});
+
+    vector<int> ans;
+
+    vector<vector<int>> arr(n,vector<int>(m));
+
+    for(i=0;i<n;i++){
+
+        for(j=0;j<m;j++){
+
+            cin >> arr[i][j];
+
+        }
+
+    }
+
+    queue<pair<char,pair<int,int>>> run,em;
+
+    for(i=0;i<m;i++){
+
+        if(arr[0][i]==0){
+
+            continue;
+
+        }
+
+        if(arr[0][i]==11||arr[0][i]==12||arr[0][i]==21||arr[0][i]==31){
+
+            c++;
+
+            int cou=0;
+
+            run.push({'W',{0,i}});
+
+            while(!run.empty()){
+
+                //cout << "\n";
+
+                char p=run.front().first;
+
+                int x=run.front().second.first,y=run.front().second.second;
+
+                cou++;
+
+                run.pop();
+
+                /*for(I=0;I<n;I++){
+
+                    for(J=0;J<m;J++){
+
+                        cout << arr[I][J] << " ";
+
+                    }cout << "\n";
+
+                }//*/
+
+                if(x<0||y<0||x>=n||y>=m){
+
+                    break;
+
+                }
+
+
+                for(auto [a,b]:song[arr[x][y]]){
+
+                    //cout << a<< " " << b  << "\n";
+
+                    if(p==a){
+
+                        if(b=='W'){
+
+                            run.push({'S',{x-1,y}});
+
+                        }
+
+                        else if(b=='A'){
+
+                            run.push({'D',{x,y-1}});
+
+                        }
+
+                        else if(b=='S'){
+
+                            run.push({'W',{x+1,y}});
+
+                        }
+
+                        else{
+
+                            run.push({'A',{x,y+1}});
+
+                        }
+
+
+                    }
+
+                }
+
+                if(arr[x][y]==31){
+
+                        if(p=='W'){
+
+                            arr[x][y]=22;
+
+                        }
+
+                        else if(p=='A'){
+
+                            arr[x][y]=21;
+
+                        }
+
+                        else if(p=='S'){
+
+                            arr[x][y]=22;
+
+                        }
+
+                        else{
+
+                           arr[x][y]=21;
+
+                        }
+
+                }
+
+                else{
+
+                    arr[x][y]=0;
+
+                }
+
+            }
+
+            run=em;
+
+            ans.push_back(cou);
+
+        }
+
+    }
+
+    for(i=0;i<m;i++){
+
+        if(arr[n-1][i]==0){
+
+            continue;
+
+        }
+
+        if(arr[n-1][i]==13||arr[n-1][i]==14||arr[n-1][i]==21||arr[n-1][i]==31){
+
+            c++;
+
+            int cou=0;
+
+            run.push({'S',{n-1,i}});
+
+            while(!run.empty()){
+
+                //cout << "\n";
+
+                char p=run.front().first;
+
+                int x=run.front().second.first,y=run.front().second.second;
+
+                cou++;
+
+                run.pop();
+
+                /*for(I=0;I<n;I++){
+
+                    for(J=0;J<m;J++){
+
+                        cout << arr[I][J] << " ";
+
+                    }cout << "\n";
+
+                }//*/
+
+                if(x<0||y<0||x>=n||y>=m){
+
+                    break;
+
+                }
+
+
+                for(auto [a,b]:song[arr[x][y]]){
+
+                    //cout << a<< " " << b  << "\n";
+
+                    if(p==a){
+
+                        if(b=='W'){
+
+                            run.push({'S',{x-1,y}});
+
+                        }
+
+                        else if(b=='A'){
+
+                            run.push({'D',{x,y-1}});
+
+                        }
+
+                        else if(b=='S'){
+
+                            run.push({'W',{x+1,y}});
+
+                        }
+
+                        else{
+
+                            run.push({'A',{x,y+1}});
+
+                        }
+
+
+                    }
+
+                }
+
+                if(arr[x][y]==31){
+
+                        if(p=='W'){
+
+                            arr[x][y]=22;
+
+                        }
+
+                        else if(p=='A'){
+
+                            arr[x][y]=21;
+
+                        }
+
+                        else if(p=='S'){
+
+                            arr[x][y]=22;
+
+                        }
+
+                        else{
+
+                           arr[x][y]=21;
+
+                        }
+
+                }
+
+                else{
+
+                    arr[x][y]=0;
+
+                }
+
+            }
+
+            run=em;
+
+            ans.push_back(cou);
+
+        }
+
+    }
+
+    for(i=0;i<n;i++){
+
+        if(arr[i][0]==0){
+
+            continue;
+
+        }
+
+        if(arr[i][0]==11||arr[i][0]==13||arr[i][0]==22||arr[i][0]==31){
+
+            c++;
+
+            int cou=0;
+
+            run.push({'A',{i,0}});
+
+            while(!run.empty()){
+
+                //cout << "\n";
+
+                char p=run.front().first;
+
+                int x=run.front().second.first,y=run.front().second.second;
+
+                cou++;
+
+                run.pop();
+
+                /*for(I=0;I<n;I++){
+
+                    for(J=0;J<m;J++){
+
+                        cout << arr[I][J] << " ";
+
+                    }cout << "\n";
+
+                }//*/
+
+                if(x<0||y<0||x>=n||y>=m){
+
+                    break;
+
+                }
+
+
+                for(auto [a,b]:song[arr[x][y]]){
+
+                    //cout << a<< " " << b  << "\n";
+
+                    if(p==a){
+
+                        if(b=='W'){
+
+                            run.push({'S',{x-1,y}});
+
+                        }
+
+                        else if(b=='A'){
+
+                            run.push({'D',{x,y-1}});
+
+                        }
+
+                        else if(b=='S'){
+
+                            run.push({'W',{x+1,y}});
+
+                        }
+
+                        else{
+
+                            run.push({'A',{x,y+1}});
+
+                        }
+
+
+                    }
+
+                }
+
+                if(arr[x][y]==31){
+
+                        if(p=='W'){
+
+                            arr[x][y]=22;
+
+                        }
+
+                        else if(p=='A'){
+
+                            arr[x][y]=21;
+
+                        }
+
+                        else if(p=='S'){
+
+                            arr[x][y]=22;
+
+                        }
+
+                        else{
+
+                           arr[x][y]=21;
+
+                        }
+
+                }
+
+                else{
+
+                    arr[x][y]=0;
+
+                }
+
+            }
+
+            run=em;
+
+            ans.push_back(cou);
+
+        }
+
+    }
+
+    for(i=0;i<n;i++){
+
+        if(arr[i][m-1]==0){
+
+            continue;
+
+        }
+
+        if(arr[i][m-1]==12||arr[i][m-1]==14||arr[i][m-1]==22||arr[i][m-1]==31){
+
+            c++;
+
+            int cou=0;
+
+            run.push({'D',{i,m-1}});
+
+            while(!run.empty()){
+
+                //cout << "\n";
+
+                char p=run.front().first;
+
+                int x=run.front().second.first,y=run.front().second.second;
+
+                cou++;
+
+                run.pop();
+
+                /*for(I=0;I<n;I++){
+
+                    for(J=0;J<m;J++){
+
+                        cout << arr[I][J] << " ";
+
+                    }cout << "\n";
+
+                }//*/
+
+                if(x<0||y<0||x>=n||y>=m){
+
+                    break;
+
+                }
+
+
+                for(auto [a,b]:song[arr[x][y]]){
+
+                    //cout << a<< " " << b  << "\n";
+
+                    if(p==a){
+
+                        if(b=='W'){
+
+                            run.push({'S',{x-1,y}});
+
+                        }
+
+                        else if(b=='A'){
+
+                            run.push({'D',{x,y-1}});
+
+                        }
+
+                        else if(b=='S'){
+
+                            run.push({'W',{x+1,y}});
+
+                        }
+
+                        else{
+
+                            run.push({'A',{x,y+1}});
+
+                        }
+
+
+                    }
+
+                }
+
+                if(arr[x][y]==31){
+
+                        if(p=='W'){
+
+                            arr[x][y]=22;
+
+                        }
+
+                        else if(p=='A'){
+
+                            arr[x][y]=21;
+
+                        }
+
+                        else if(p=='S'){
+
+                            arr[x][y]=22;
+
+                        }
+
+                        else{
+
+                           arr[x][y]=21;
+
+                        }
+
+                }
+
+                else{
+
+                    arr[x][y]=0;
+
+                }
+
+            }
+
+            run=em;
+
+            ans.push_back(cou);
+
+        }
+
+    }//*/
+
+    cout << c << "\n";
+
+    for(int x:ans){
+
+        cout << x-1 << " ";
+
+    }
+
+}

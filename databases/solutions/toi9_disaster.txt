@@ -1,0 +1,107 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+
+class Solution {
+
+public:
+
+    unordered_map<char, multiset<char>> graph;
+
+    vector<char> path;
+
+
+    void dfs(char node) {
+
+        while (!graph[node].empty()) {
+
+            char next = *graph[node].begin();
+
+            graph[node].erase(graph[node].begin());
+
+            graph[next].erase(graph[next].find(node));
+
+            dfs(next);
+
+        }
+
+        path.push_back(node);
+
+    }
+
+
+    void solve() {
+
+        int edgeCount;
+
+        cin >> edgeCount;
+
+
+        set<char> allNodes;
+
+        for (int i = 0; i < edgeCount; ++i) {
+
+            string s;
+
+            cin >> s;
+
+            char u = s[0], v = s[1];
+
+            graph[u].insert(v);
+
+            graph[v].insert(u);
+
+            allNodes.insert(u);
+
+            allNodes.insert(v);
+
+        }
+
+
+        // Find start point for Eulerian path
+
+        char start = *allNodes.begin(); // default start
+
+        for (char c : allNodes) {
+
+            if (graph[c].size() % 2 == 1) {
+
+                start = c;
+
+                break;
+
+            }
+
+        }
+
+
+        dfs(start);
+
+        reverse(path.begin(), path.end());
+
+        for (int i = 0; i < path.size(); ++i) {
+
+            cout << path[i];
+
+            if (i + 1 < path.size()) cout << ' ';
+
+        }
+
+        cout << '\n';
+
+    }
+
+};
+
+
+int main() {
+
+    ios::sync_with_stdio(false);
+
+    cin.tie(nullptr);
+
+    Solution().solve();
+
+}
+

@@ -1,0 +1,118 @@
+#include <bits/stdc++.h>
+
+
+const int size = 2 << 15;
+
+const int hash = size - 1;
+
+std::vector<std::set<std::pair<int, int>>> testNum(size + 5);
+
+
+signed main() {
+
+    std::ios::sync_with_stdio(false);
+
+    std::cin.tie(nullptr);
+
+
+    int testn, testl;
+
+    std::cin >> testn >> testl;
+
+
+    for (int i = 1; i <= testn; i++) {
+
+        std::string cs;
+
+        std::cin >> cs;
+
+        int sum = 0;
+
+        int mul = 1;
+
+
+        for (int ic = 0; ic < testl; ic++) {
+
+            sum += (cs[ic] - '0') * mul;
+
+            mul = mul << 1;
+
+        }
+
+
+        testNum[sum & (hash)].insert({sum, i});
+
+    }
+
+
+    int q;
+
+    std::cin >> q;
+
+
+    while (q--) {
+
+        int strlen;
+
+        std::string searchS;
+
+        std::cin >> strlen;
+
+        std::cin >> searchS;
+
+
+        std::set<int> res;
+
+
+        if (strlen >= testl) {
+
+            int curr = 0;
+
+
+            for (int i = 0; i < testl - 1; i++) {
+
+                curr = curr >> 1;
+
+                if (searchS[i] == '1') curr += 1 << (testl - 1);
+
+            }
+
+
+            for (int i = testl - 1; i < strlen; i++) {
+
+                curr = curr >> 1;
+
+                if (searchS[i] == '1') curr += 1 << (testl - 1);
+
+
+                auto first = testNum[curr & (hash)].lower_bound({curr, -1e9});
+
+                auto second = testNum[curr & (hash)].upper_bound({curr + 1, -1e9});
+
+
+                for (auto ci = first; ci != second && ci->first == curr; ci++) {
+
+                    res.insert(ci->second);
+
+                }
+
+            }
+
+        }
+
+
+        if (res.empty()) {
+
+            std::cout << "OK\n";
+
+        } else {
+
+            for (auto num : res) std::cout << num << ' ';
+
+            std::cout << '\n';
+
+        }
+
+    }
+
+}
