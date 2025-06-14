@@ -1,0 +1,41 @@
+#include <bits/stdc++.h>
+using namespace std;
+const int N=110;
+const int di[]={0,0,-1,1};
+const int dj[]={-1,1,0,0};
+struct Non{int x,y,depth;};
+char A[N][N];
+int dis[N][N];
+queue<Non> q;
+int main(){
+    ios::sync_with_stdio(0);cin.tie(0);cout.tie(0);
+
+    int n,m;
+    cin >> n >> m;
+    for(int i=0;i<n;i++)for(int j=0;j<m;j++)cin >> A[i][j],dis[i][j]=1e9;
+
+    q.push({0,0,dis[0][0]=1});
+    while(!q.empty()){
+        auto [i,j,d]=q.front();
+        q.pop();
+
+        for(int k=0;k<4;k++){
+            int ik=i+di[k];
+            int jk=j+dj[k];
+            if(ik<0||jk<0||ik>=n||jk>=m)continue;
+            if(di[k]==1&&(A[i][j]!='D'&&A[i][j]!='B'))continue;
+            if(di[k]==-1&&(A[ik][jk]!='D'&&A[ik][jk]!='B'))continue;
+            if(dj[k]==1&&(A[i][j]!='R'&&A[i][j]!='B'))continue;
+            if(dj[k]==-1&&(A[ik][jk]!='R'&&A[ik][jk]!='B'))continue;
+            if(dis[ik][jk]<d+1)continue;
+            if(dis[ik][jk]==d+1){
+                cout << d+1 << "\n" << ik+1 << ' ' << jk+1;
+                return 0;
+            }
+            dis[ik][jk]=d+1;
+            q.push({ik,jk,d+1});
+        }
+    }
+
+    return 0;
+}

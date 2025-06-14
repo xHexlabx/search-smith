@@ -1,0 +1,30 @@
+#include <iostream>
+#include <queue>
+#include <numeric>
+
+int main() {
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+
+    int num_elements, steps_to_remove;
+    std::cin >> num_elements >> steps_to_remove;
+
+    std::queue<int> elements_queue;
+    for (int i = 1; i <= num_elements; ++i) {
+        elements_queue.push(i);
+    }
+
+    while (!elements_queue.empty()) {
+        // Move the first (steps_to_remove - 1) elements to the back of the queue
+        for (int i = 1; i < steps_to_remove; ++i) {
+            elements_queue.push(elements_queue.front());
+            elements_queue.pop();
+        }
+        // Print and remove the element at the front
+        std::cout << elements_queue.front() << ' ';
+        elements_queue.pop();
+    }
+    std::cout << std::endl;
+
+    return 0;
+}

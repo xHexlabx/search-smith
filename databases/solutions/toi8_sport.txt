@@ -1,0 +1,22 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int k,a,b;
+
+void dfs(int w,int l,string s){
+    if(w==k || l==k){
+        cout<<s<<endl;
+        return;
+    }
+
+    dfs(w+1,l,s+"W ");
+    dfs(w,l+1,s+"L ");
+}
+
+int main(){
+    ios::sync_with_stdio(false); cin.tie(0);
+    
+    cin>>k>>a>>b;
+
+    dfs(a,b,"");
+}

@@ -1,0 +1,13 @@
+#include <bits/stdc++.h>
+using namespace std;
+signed main(void) {
+    int n,sum=0;
+    cin >> n;
+    while (n >0) {
+    	if (n >= 10) sum+=3000,n-=15;
+    	else if (n>=4) sum+=1500,n-=5;
+    	else if (n >= 2) sum+=800,n-=2;
+    	else sum+=500,n--;
+    }
+    cout << sum;
+}

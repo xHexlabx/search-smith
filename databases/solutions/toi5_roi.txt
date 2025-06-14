@@ -1,0 +1,23 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int price;
+    cin >> price;
+
+    int min_num = INT_MAX, min_price = INT_MAX;
+    double min_profit = INT_MAX;
+    for(int p = 74 ; p <= 144 ; p++){
+        for (int n = 1000 ; n <= 15000 ; n+=500){
+            double a = ((100-(0.8569 * exp(0.09*(p-100))))*n)/100.0;
+            double pro = (a*p)-price-(n*(100-(n/500-2)));
+            if (a>=0 && pro<min_profit && pro>0){
+                min_num = n;
+                min_price = p;
+                min_profit = pro;
+            }
+        }
+    }
+
+    printf("%d\n%d\n%.2lf", min_num, min_price, min_profit);
+}

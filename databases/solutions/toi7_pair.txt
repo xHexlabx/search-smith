@@ -1,0 +1,68 @@
+#include <iostream>
+#include <vector>
+#include <numeric>
+
+long long mergeAndCount(std::vector<int>& arr, std::vector<int>& temp, std::vector<long long>& prefixSum, int left, int right) {
+    if (left >= right) {
+        return 0;
+    }
+
+    int mid = left + (right - left) / 2;
+    long long inversions = 0;
+
+    inversions += mergeAndCount(arr, temp, prefixSum, left, mid);
+    inversions += mergeAndCount(arr, temp, prefixSum, mid + 1, right);
+
+    for (int i = left; i <= right; ++i) {
+        prefixSum[i + 1] = prefixSum[i] + arr[i];
+    }
+
+    int k = 0;
+    int leftPtr = left;
+    int rightPtr = mid + 1;
+
+    while (leftPtr <= mid && rightPtr <= right) {
+        if (arr[leftPtr] > arr[rightPtr]) {
+            inversions += prefixSum[mid + 1] - prefixSum[leftPtr] + (long long)(mid - leftPtr + 1) * arr[rightPtr];
+            temp[k++] = arr[rightPtr++];
+        } else {
+            temp[k++] = arr[leftPtr++];
+        }
+    }
+
+    while (leftPtr <= mid) {
+        temp[k++] = arr[leftPtr++];
+    }
+
+    while (rightPtr <= right) {
+        temp[k++] = arr[rightPtr++];
+    }
+
+    for (int i = left; i <= right; ++i) {
+        arr[i] = temp[i - left];
+    }
+
+    return inversions;
+}
+
+int main() {
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+
+    int n;
+    std::cin >> n;
+
+    std::vector<int> a(n);
+    std::vector<int> b_temp(n);
+    std::vector<long long> prefixSum(n + 1, 0);
+
+    for (int i = 0; i < n; ++i) {
+        int val, idx;
+        std::cin >> val >> idx;
+        a[idx - 1] = val;
+    }
+
+    std::cout << mergeAndCount(a, b_temp, prefixSum, 0, n - 1) << std::endl;
+
+    return 0;
+}

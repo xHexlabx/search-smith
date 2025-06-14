@@ -1,0 +1,162 @@
+#include <iostream>
+#include <string>
+#include <queue>
+#include <stack>
+#include <algorithm> // For std::min or std::max if needed, though not directly used in the refactor below.
+
+// Global queues and stacks are generally discouraged in competitive programming
+// unless explicitly required for specific data structures (e.g., BFS/DFS).
+// For this problem, they are used repeatedly, so moving them inside main or
+// passing them as arguments would be cleaner. However, to minimize changes
+// and focus on understandability, I'll keep them global for now but note it.
+// If they were to be reset for each test case, they should be cleared.
+// In this specific code, `qu` and `st` are cleared/emptied implicitly or explicitly
+// within the loops, so their global scope is less problematic than it might seem
+// at first glance, but still not ideal practice.
+std::queue<char> parenthesis_balance_checker_queue; // Renamed for clarity
+std::stack<int> operation_indices_stack; // Renamed for clarity
+
+/*
+    Overall Idea:
+
+    This program processes a series of operations on an input mathematical expression string.
+    For each test case, it iteratively modifies the expression based on user-provided indices.
+
+    The core logic involves:
+    1. Finding the lowest precedence operator (among '+', '*', '^') at the outermost level of the expression.
+       Parentheses are handled to correctly identify outermost operators.
+    2. Based on the chosen operator, it attempts to extract a sub-expression specified by an input index.
+    3. If the expression is just a parenthesized sub-expression at the outermost level, it removes the parentheses.
+    4. This process repeats until a '0' is entered as an index, signifying the end of operations for the current test case.
+    5. Finally, it prints the sequence of operations applied and the resulting expression (or "=null" if an invalid operation occurred).
+
+*/
+int main() {
+    // Disable synchronization with C-style I/O and untie cin/cout for faster I/O.
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+
+    std::string initial_expression;
+    std::cin >> initial_expression;
+
+    int num_test_cases;
+    std::cin >> num_test_cases;
+
+    // Process each test case
+    while (num_test_cases--) {
+        std::string current_expression = initial_expression; // Start with the original expression for each test case
+        bool is_null_result = false; // Flag to indicate if the result should be "null"
+
+        // Clear global data structures for each test case to avoid stale data
+        while (!parenthesis_balance_checker_queue.empty()) {
+            parenthesis_balance_checker_queue.pop();
+        }
+        while (!operation_indices_stack.empty()) {
+            operation_indices_stack.pop();
+        }
+
+        // --- Process operations for the current expression ---
+        while (true) {
+            int operation_index;
+            std::cin >> operation_index;
+
+            // '0' indicates the end of operations for the current test case
+            if (operation_index == 0) {
+                break;
+            }
+
+            operation_indices_stack.push(operation_index); // Store the operation index
+
+            char lowest_precedence_operator = 'a'; // Placeholder, 'a' is not an operator
+            // Identify the lowest precedence operator at the outermost level
+            // This loop iterates through the expression to find the operator with the lowest precedence
+            // that is not enclosed within parentheses.
+            for (char ch : current_expression) {
+                if (ch == '(') {
+                    parenthesis_balance_checker_queue.push('(');
+                } else if (ch == ')') {
+                    if (!parenthesis_balance_checker_queue.empty()) {
+                        parenthesis_balance_checker_queue.pop();
+                    }
+                } else if (parenthesis_balance_checker_queue.empty()) { // Only consider operators outside parentheses
+                    if (ch == '^' && (lowest_precedence_operator != '*' && lowest_precedence_operator != '+')) {
+                        lowest_precedence_operator = '^';
+                    } else if (ch == '*' && lowest_precedence_operator != '+') {
+                        lowest_precedence_operator = '*';
+                    } else if (ch == '+') { // '+' has the lowest precedence
+                        lowest_precedence_operator = '+';
+                    }
+                }
+            }
+
+            int operator_count = 1; // Counts occurrences of the lowest precedence operator
+            std::string temp_expression_segment = ""; // Stores the extracted segment
+            // This loop re-iterates to find the N-th occurrence of the identified lowest precedence operator
+            // and extract the sub-expression associated with it.
+            // It also clears the queue to reuse for balance checking.
+            while (!parenthesis_balance_checker_queue.empty()) {
+                parenthesis_balance_checker_queue.pop();
+            }
+
+            for (char ch : current_expression) {
+                if (ch == '(') {
+                    parenthesis_balance_checker_queue.push('(');
+                } else if (ch == ')') {
+                    if (!parenthesis_balance_checker_queue.empty()) {
+                        parenthesis_balance_checker_queue.pop();
+                    }
+                }
+
+                if (parenthesis_balance_checker_queue.empty() && ch == lowest_precedence_operator) {
+                    operator_count++;
+                } else if (operator_count == operation_index) { // If this is the desired segment, append to temp
+                    temp_expression_segment += ch;
+                }
+            }
+
+            // Handle special cases: single element or invalid index
+            if (operator_count == 1) { // If no operators or only one part (e.g., "A", "(B)")
+                // Check if the current expression is an entirely parenthesized sub-expression
+                if (current_expression[0] == '(' && current_expression.back() == ')') {
+                    current_expression = current_expression.substr(1, current_expression.size() - 2); // Remove outermost parentheses
+                    if (operation_index > 1) { // If an invalid index was provided for a parenthesized expression
+                        is_null_result = true;
+                    }
+                    continue; // Continue to the next operation as the expression was simplified
+                }
+            }
+
+            // If the requested operation_index is out of bounds
+            if (operation_index > operator_count) {
+                is_null_result = true;
+            }
+
+            current_expression = temp_expression_segment; // Update the expression for the next iteration
+        }
+
+        // --- Print the results for the current test case ---
+        int num_operations = operation_indices_stack.size();
+
+        // Print the sequence of operations in reverse order (due to stack LIFO)
+        while (!operation_indices_stack.empty()) {
+            int op_val = operation_indices_stack.top();
+            operation_indices_stack.pop();
+            std::cout << "op(" << op_val << ',';
+        }
+        std::cout << 'p'; // 'p' represents the final expression or null
+
+        // Close all the 'op(' parentheses
+        for (int i = 0; i < num_operations; ++i) {
+            std::cout << ')';
+        }
+
+        // Print the final result
+        if (is_null_result) {
+            std::cout << "=null\n";
+        } else {
+            std::cout << '=' << current_expression << '\n';
+        }
+    }
+
+    return 0;
+}

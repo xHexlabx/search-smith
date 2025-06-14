@@ -1,0 +1,64 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+
+int main() {
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+    std::cout.tie(NULL);
+
+    int num_triangles;
+    std::cin >> num_triangles;
+
+    std::vector<std::vector<char>> grid(15, std::vector<char>(99, '\0'));
+    int max_height = -1;
+    int max_width = -1;
+
+    for (int t = 0; t < num_triangles; ++t) {
+        int start_column, height;
+        std::cin >> start_column >> height;
+
+        max_height = std::max(max_height, height);
+        max_width = std::max(max_width, start_column + 2 * height - 1);
+
+        for (int i = 1; i <= height; ++i) {
+            for (int j = start_column + i - 1; j < start_column + 2 * height - i + 1; ++j) {
+                if (j == start_column + i - 1) {
+                    if (grid[i][j] == 'X') {
+                        continue;
+                    }
+                    if (grid[i][j] == '\\') {
+                        grid[i][j] = 'v';
+                    } else {
+                        grid[i][j] = '/';
+                    }
+                } else if (j == start_column + 2 * height - i) {
+                    if (grid[i][j] == 'X') {
+                        continue;
+                    }
+                    if (grid[i][j] == '/') {
+                        grid[i][j] = 'v';
+                    } else {
+                        grid[i][j] = '\\';
+                    }
+                } else {
+                    grid[i][j] = 'X';
+                }
+            }
+        }
+    }
+
+    for (int i = max_height; i > 0; --i) {
+        for (int j = 1; j <= max_width; ++j) {
+            if (grid[i][j]) {
+                std::cout << grid[i][j];
+            } else {
+                std::cout << '.';
+            }
+        }
+        std::cout << '\n';
+    }
+
+    return 0;
+}

@@ -1,0 +1,12 @@
+#include <bits/stdc++.h>
+using namespace std;
+int main(void) {
+    int n,ans =0;
+	cin >> n;
+    int a[n],b[n];
+    for (auto& i : a) cin >> i;
+    for (auto& i : b) cin >> i;
+    sort(a,a+n); sort(b,b+n);
+    for (int i=0 ;i< n ; i++) ans += abs(a[i]-b[i]);
+    cout << ans;
+}

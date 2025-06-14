@@ -1,0 +1,91 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <queue>
+#include <algorithm>
+#include <climits>
+
+using namespace std;
+
+const int MAX_DIM = 65;
+int grid_width, grid_height;
+int tree_count_prefix_sum[MAX_DIM][MAX_DIM];
+string grid_data[MAX_DIM];
+bool possible_area_found = false;
+int min_pond_count = INT_MAX;
+
+pair<int, int> directions[4] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+
+int count_connected_ponds(int end_y, int end_x, int square_size) {
+    int temp_grid[MAX_DIM][MAX_DIM];
+    int current_pond_count = 0;
+    queue<pair<int, int>> q;
+
+    for (int i = 1; i <= grid_height; ++i) {
+        for (int j = 1; j <= grid_width; ++j) {
+            temp_grid[i][j] = (grid_data[i][j] == 'P' ? 1 : 0);
+        }
+    }
+
+    for (int i = end_y - square_size + 1; i <= end_y; ++i) {
+        for (int j = end_x - square_size + 1; j <= end_x; ++j) {
+            if (temp_grid[i][j] == 1) {
+                current_pond_count++;
+                q.push({i, j});
+                while (!q.empty()) {
+                    auto [current_y, current_x] = q.front();
+                    q.pop();
+                    temp_grid[current_y][current_x] = 0;
+
+                    for (int d = 0; d < 4; ++d) {
+                        int neighbor_y = current_y + directions[d].first;
+                        int neighbor_x = current_x + directions[d].second;
+
+                        if (neighbor_y >= 1 && neighbor_y <= grid_height &&
+                            neighbor_x >= 1 && neighbor_x <= grid_width &&
+                            temp_grid[neighbor_y][neighbor_x] == 1) {
+                            q.push({neighbor_y, neighbor_x});
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return current_pond_count;
+}
+
+int main() {
+    cin.tie(NULL)->sync_with_stdio(false);
+
+    cin >> grid_width >> grid_height;
+
+    for (int i = 1; i <= grid_height; ++i) {
+        cin >> grid_data[i];
+        grid_data[i] = " " + grid_data[i];
+        for (int j = 1; j <= grid_width; ++j) {
+            tree_count_prefix_sum[i][j] = tree_count_prefix_sum[i][j - 1] + tree_count_prefix_sum[i - 1][j] - tree_count_prefix_sum[i - 1][j - 1];
+            if (grid_data[i][j] == 'T') {
+                tree_count_prefix_sum[i][j]++;
+            }
+        }
+    }
+
+    for (int sz = min(grid_width, grid_height); sz >= 1; --sz) {
+        for (int i = sz; i <= grid_height; ++i) {
+            for (int j = sz; j <= grid_width; ++j) {
+                if ((tree_count_prefix_sum[i][j] - tree_count_prefix_sum[i][j - sz] - tree_count_prefix_sum[i - sz][j] + tree_count_prefix_sum[i - sz][j - sz]) == 0) {
+                    possible_area_found = true;
+                    min_pond_count = min(min_pond_count, count_connected_ponds(i, j, sz));
+                }
+            }
+        }
+        if (possible_area_found) {
+            cout << sz * sz << ' ' << min_pond_count;
+            return 0;
+        }
+    }
+
+    cout << 0 << ' ' << 0;
+
+    return 0;
+}

@@ -1,0 +1,75 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <tuple>
+#include <algorithm>
+
+const int MAX_GRID_SIZE = 160;
+const int ROW_DIRECTIONS[] = {0, 0, -1, 1}; // Corresponds to Left, Right, Up, Down
+const int COL_DIRECTIONS[] = {-1, 1, 0, 0}; // Corresponds to Left, Right, Up, Down
+
+int numRows, numCols, minTotalDistance = 1e9, intersectionCount = 0;
+
+int sourceCoords[2]; // {row, col}
+int destCoords[2];   // {row, col}
+
+int distances[2][MAX_GRID_SIZE][MAX_GRID_SIZE]; // [0] for source, [1] for destination
+
+int grid[MAX_GRID_SIZE][MAX_GRID_SIZE];
+
+std::queue<std::tuple<int, int, int>> bfsQueue;
+
+void runBFS(int startRow, int startCol, int bfsIndex) {
+    bfsQueue.push({startRow, startCol, distances[bfsIndex][startRow][startCol] = 1});
+
+    while (!bfsQueue.empty()) {
+        auto [currentRow, currentCol, currentDistance] = bfsQueue.front();
+        bfsQueue.pop();
+
+        for (int k = 0; k < 4; ++k) {
+            int nextRow = currentRow + ROW_DIRECTIONS[k];
+            int nextCol = currentCol + COL_DIRECTIONS[k];
+
+            if (nextRow < 1 || nextRow > numRows || nextCol < 1 || nextCol > numCols || distances[bfsIndex][nextRow][nextCol] != 0) {
+                continue;
+            }
+
+            distances[bfsIndex][nextRow][nextCol] = currentDistance + 1;
+
+            if (grid[nextRow][nextCol] != 0) {
+                bfsQueue.push({nextRow, nextCol, currentDistance + 1});
+            }
+        }
+    }
+}
+
+int main() {
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    std::cout.tie(nullptr);
+
+    std::cin >> numRows >> numCols >> sourceCoords[0] >> sourceCoords[1] >> destCoords[0] >> destCoords[1];
+
+    for (int i = 1; i <= numRows; ++i) {
+        for (int j = 1; j <= numCols; ++j) {
+            std::cin >> grid[i][j];
+        }
+    }
+
+    runBFS(sourceCoords[0], sourceCoords[1], 0);
+
+    runBFS(destCoords[0], destCoords[1], 1);
+
+    for (int i = 1; i <= numRows; ++i) {
+        for (int j = 1; j <= numCols; ++j) {
+            if (grid[i][j] == 0 && distances[0][i][j] != 0 && distances[1][i][j] != 0) {
+                intersectionCount++;
+                minTotalDistance = std::min(minTotalDistance, distances[0][i][j] + distances[1][i][j] - 1);
+            }
+        }
+    }
+
+    std::cout << intersectionCount << "\n" << minTotalDistance << std::endl;
+
+    return 0;
+}

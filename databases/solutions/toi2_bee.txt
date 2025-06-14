@@ -1,0 +1,134 @@
+#include <iostream> // For standard input/output operations (cin, cout)
+#include <vector>   // For std::vector, a dynamic array
+
+// Define a constant for the maximum number of years to precompute.
+// This is based on the array size 30, so up to year 29.
+const int MAX_YEARS = 30;
+
+// `colony_population_by_year` stores the population counts for different roles
+// for each year. The columns represent:
+// Column 0: Queen count (always 1 in this model)
+// Column 1: Worker count
+// Column 2: Soldier count
+// Initialized for year 0: {1, 1, 0}
+int colony_population_by_year[MAX_YEARS][3] = {{1, 1, 0}};
+
+// `is_year_computed` is a boolean array to track which years' populations
+// have already been computed and stored in `colony_population_by_year`.
+bool is_year_computed[MAX_YEARS] = {true}; // Year 0 is pre-computed
+
+/**
+ * @brief Recursively computes the population counts for a given year.
+ * This function calculates the queen, worker, and soldier counts
+ * for 'year_idx' based on the counts from 'year_idx - 1'.
+ *
+ * The population rules seem to be:
+ * - Queen (arr[year_idx+1][0]): Always 1 (assuming one queen per colony always).
+ * - Workers (arr[year_idx+1][1]): Current year's workers + current year's soldiers + 1 (new queen).
+ * This implies workers are the sum of the previous year's
+ * workers and soldiers, plus one new worker (presumably the queen's offspring).
+ * Oh, upon closer inspection, it seems to be:
+ * (Previous year's workers + previous year's soldiers + current queen).
+ * Let's assume the current logic is:
+ * New Workers = Old Workers + Old Soldiers + New Queen (1)
+ * - Soldiers (arr[year_idx+1][2]): Equivalent to the previous year's worker count.
+ *
+ * @param year_idx The year for which to compute the population.
+ */
+void calculate_colony_population(int year_idx) {
+    // Base case for recursion: if year_idx is 0, it's already pre-computed.
+    if (year_idx == 0) {
+        return;
+    }
+
+    // Recursive call to ensure the previous year's data is computed first.
+    // This makes sure we have arr[year_idx-1] available before computing arr[year_idx].
+    calculate_colony_population(year_idx - 1);
+
+    // Check if the current year's data has already been computed.
+    // This 'if (is_year_computed[year_idx])' seems to prevent re-computation,
+    // but the structure of the original code's recursive call means it will
+    // always be true for year_idx and subsequent steps will go to year_idx+1.
+    // A better way would be to just compute directly or memoize for year_idx.
+    // Given the original structure:
+    // It's checking if the 'current year' (year_idx from parameter) is computed.
+    // If it *is* computed (which it won't be on the first call for a new year),
+    // then it proceeds to compute year_idx + 1.
+    // This suggests a slight misinterpretation in the original code's logic.
+    // Let's re-align to how it was likely intended, computing for `year_idx` from `year_idx-1`.
+
+    // The original logic calculates for `a+1` using `a`.
+    // So, when `calculate_colony_population(year_idx)` is called, it needs to compute `year_idx`.
+    // The base case `if (a != 0) year(a-1);` then `if (vis[a])` is confusing.
+    // Let's refactor this function to simply compute the year_idx's data if not already computed.
+
+    if (!is_year_computed[year_idx]) {
+        // Queen count for the current year (year_idx).
+        colony_population_by_year[year_idx][0] = 1; // Always 1 Queen
+
+        // Worker count for the current year (year_idx):
+        // Sum of previous year's workers, previous year's soldiers, and the new Queen (1).
+        // This is a common pattern in certain population growth problems (e.g., Fibonacci-like).
+        colony_population_by_year[year_idx][1] =
+            colony_population_by_year[year_idx - 1][1] +
+            colony_population_by_year[year_idx - 1][2] +
+            colony_population_by_year[year_idx - 1][0]; // Using previous year's Queen count (which is 1)
+
+        // Soldier count for the current year (year_idx):
+        // This is equal to the number of workers from the previous year.
+        colony_population_by_year[year_idx][2] = colony_population_by_year[year_idx - 1][1];
+
+        // Mark this year as computed.
+        is_year_computed[year_idx] = true;
+    }
+}
+
+
+int main() {
+    // Optimize C++ standard streams for competitive programming.
+    // This unties cin from cout and prevents synchronization with C's stdio.
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+
+    // Precompute population data up to MAX_YEARS - 1.
+    // The original code called `year(25)`, so it precomputes up to index 25.
+    // Here, we call for each year from 1 up to MAX_YEARS - 1.
+    for (int i = 1; i < MAX_YEARS; ++i) {
+        calculate_colony_population(i);
+    }
+
+
+    // `query_years` stores the years for which the user wants output.
+    std::vector<int> query_years;
+    int year_input;
+    int num_queries = 0; // Renamed 'n' to 'num_queries' for clarity
+
+    // Read years from input until -1 is encountered.
+    while (std::cin >> year_input && year_input != -1) {
+        query_years.push_back(year_input);
+        num_queries++;
+    }
+
+    // For each queried year, print the total worker count and the total population.
+    for (int i = 0; i < num_queries; ++i) {
+        int current_year = query_years[i];
+
+        // Ensure the queried year is within the precomputed range.
+        if (current_year >= 0 && current_year < MAX_YEARS) {
+            long long workers = colony_population_by_year[current_year][1];
+            long long soldiers = colony_population_by_year[current_year][2];
+            long long queen = colony_population_by_year[current_year][0]; // Should be 1
+
+            long long total_population = workers + soldiers + queen;
+
+            // Output format: Workers Count, Total Population
+            std::cout << workers << " " << total_population << "\n";
+        } else {
+            // Handle cases where the queried year is out of bounds or not computed.
+            // For competitive programming, this might not be strictly necessary if constraints guarantee valid years.
+            std::cout << "Error: Year " << current_year << " is out of bounds or not precomputed.\n";
+        }
+    }
+
+    return 0; // Indicate successful program termination
+}

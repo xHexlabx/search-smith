@@ -1,0 +1,91 @@
+#include <iostream>  // Required for input/output operations (cin, cout)
+#include <vector>    // Required for std::vector (though not directly used after refactor, it's good practice for dynamic arrays)
+#include <queue>     // Required for std::queue
+#include <map>       // Required for std::map, used as an alternative to array for class ID to student ID mapping
+
+// Declare global arrays and queues.
+// Global variables are zero-initialized by default.
+// 'student_class_map' maps student ID to class ID. Assuming student IDs are within reasonable bounds.
+// Size 10010 implies student IDs up to 10009.
+int student_class_map[10010];
+
+// 'class_student_count' stores the number of students currently in the queue for each class.
+// Size 11 implies class IDs from 0 to 10.
+int class_student_count[11];
+
+// 'class_order_queue' maintains the order in which classes have students waiting.
+// When a student from a new class enters, that class ID is added to this queue.
+std::queue<int> class_order_queue;
+
+// 'student_queues_by_class' is an array of queues, where each queue holds
+// the student IDs for a specific class.
+std::queue<int> student_queues_by_class[11];
+
+int main() {
+    // Optimize C++ standard streams for competitive programming.
+    // This unties cin from cout and prevents synchronization with C's stdio.
+    std::cin.tie(0)->sync_with_stdio(0);
+
+    int num_classes, num_students_info;
+    std::cin >> num_classes >> num_students_info; // Read the number of classes and initial student info entries
+
+    // Read student information (class ID and student ID) and populate the map.
+    // Student IDs are assumed to start from 1.
+    for (int i = 1; i <= num_students_info; ++i) {
+        int class_id, student_id;
+        std::cin >> class_id >> student_id;
+        student_class_map[student_id] = class_id;
+    }
+
+    char command_char;
+    // Main loop to process commands: 'E' (enqueue), 'D' (dequeue), or 'X' (exit).
+    // The loop continues as long as the input character 'x' is not 'X'.
+    while (std::cin >> command_char, command_char != 'X') {
+        if (command_char == 'E') {
+            // Enqueue command: add a student to the queue system.
+            int student_id;
+            std::cin >> student_id;
+
+            int class_of_student = student_class_map[student_id];
+
+            // If this class previously had no students in the queue, add its ID
+            // to the 'class_order_queue' to mark its presence.
+            if (class_student_count[class_of_student] == 0) {
+                class_order_queue.push(class_of_student);
+            }
+
+            // Add the student to their specific class queue.
+            student_queues_by_class[class_of_student].push(student_id);
+            // Increment the count of students for this class.
+            class_student_count[class_of_student]++;
+        } else if (command_char == 'D') {
+            // Dequeue command: remove a student from the front of the overall queue.
+            if (class_order_queue.empty()) {
+                // If no classes are in the 'class_order_queue', then the entire system is empty.
+                std::cout << "empty\n"; // Print "empty" and a newline.
+            } else {
+                // Get the class ID of the next student to be served (front of the class_order_queue).
+                int current_class_to_serve = class_order_queue.front();
+
+                // Get the student ID from the front of that class's specific queue.
+                std::cout << student_queues_by_class[current_class_to_serve].front() << '\n';
+
+                // Remove the student from their class-specific queue.
+                student_queues_by_class[current_class_to_serve].pop();
+
+                // Decrement the count of students for this class.
+                class_student_count[current_class_to_serve]--;
+
+                // If this class's queue is now empty, remove its ID from the 'class_order_queue'.
+                if (student_queues_by_class[current_class_to_serve].empty()) {
+                    class_order_queue.pop();
+                }
+            }
+        }
+    }
+
+    // After the loop (when 'X' is encountered), print '0' as per problem requirements.
+    std::cout << '0';
+
+    return 0; // Indicate successful program termination
+}

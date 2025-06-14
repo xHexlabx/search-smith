@@ -1,0 +1,53 @@
+#include <iostream>
+#include <vector>
+#include <numeric>
+
+std::vector<std::vector<int>> grid;
+int num_rows, num_cols, start_col_idx;
+std::vector<int> path_directions;
+
+void find_path(int current_row, int current_col, int step_count) {
+    if (current_row == num_rows - 1) {
+        for (int i = 0; i < num_rows; ++i) {
+            std::cout << path_directions[i] << "\n";
+        }
+        return;
+    }
+
+    // Try moving Left
+    if (current_row + 1 < num_rows && current_col - 1 >= 0 && grid[current_row + 1][current_col - 1] == 0) {
+        path_directions[step_count] = 1; // Represents "Left"
+        find_path(current_row + 1, current_col - 1, step_count + 1);
+    }
+
+    // Try moving Straight
+    if (current_row + 1 < num_rows && grid[current_row + 1][current_col] == 0) {
+        path_directions[step_count] = 3; // Represents "Straight"
+        find_path(current_row + 1, current_col, step_count + 1);
+    }
+
+    // Try moving Right
+    if (current_row + 1 < num_rows && current_col + 1 < num_cols && grid[current_row + 1][current_col + 1] == 0) {
+        path_directions[step_count] = 2; // Represents "Right"
+        find_path(current_row + 1, current_col + 1, step_count + 1);
+    }
+}
+
+int main() {
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+
+    std::cin >> num_cols >> start_col_idx >> num_rows;
+
+    grid.resize(num_rows, std::vector<int>(num_cols));
+    for (int i = 0; i < num_rows; ++i) {
+        for (int j = 0; j < num_cols; ++j) {
+            std::cin >> grid[i][j];
+        }
+    }
+
+    path_directions.resize(num_rows);
+    find_path(-1, start_col_idx - 1, 0);
+
+    return 0;
+}

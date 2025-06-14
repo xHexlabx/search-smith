@@ -1,0 +1,66 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cstring>
+#include <iomanip>
+#include <limits>
+
+using namespace std;
+
+vector<int> permutation_vector;
+double current_grid[5][5];
+double initial_grid_values[5][5];
+double minimum_total_cost = numeric_limits<double>::max();
+
+int main() {
+    cin.tie(0)->sync_with_stdio(0);
+
+    int rows, cols;
+    cin >> rows >> cols;
+
+    for (int i = 1; i <= rows; ++i) {
+        for (int j = 1; j <= cols; ++j) {
+            cin >> initial_grid_values[i][j];
+        }
+    }
+
+    for (int i = 1; i <= rows * cols; ++i) {
+        permutation_vector.push_back(i);
+    }
+
+    do {
+        memcpy(current_grid, initial_grid_values, sizeof(initial_grid_values));
+        double current_total_cost = 0;
+
+        for (int cell_index : permutation_vector) {
+            int r = (cell_index - 1) / cols + 1;
+            int c = (cell_index - 1) % cols + 1;
+
+            current_total_cost += current_grid[r][c];
+
+            if (current_total_cost >= minimum_total_cost) {
+                break;
+            }
+
+            double cost_increase_for_neighbors = current_grid[r][c] / 10.0;
+
+            for (int neighbor_r = r - 1; neighbor_r <= r + 1; ++neighbor_r) {
+                for (int neighbor_c = c - 1; neighbor_c <= c + 1; ++neighbor_c) {
+                    if (neighbor_r == r && neighbor_c == c) {
+                        continue;
+                    }
+                    if (neighbor_r < 1 || neighbor_r > rows || neighbor_c < 1 || neighbor_c > cols || current_grid[neighbor_r][neighbor_c] == -1) {
+                        continue;
+                    }
+                    current_grid[neighbor_r][neighbor_c] += cost_increase_for_neighbors;
+                }
+            }
+            current_grid[r][c] = -1; // Mark as visited/processed
+        }
+        minimum_total_cost = min(minimum_total_cost, current_total_cost);
+    } while (next_permutation(permutation_vector.begin(), permutation_vector.end()));
+
+    cout << fixed << setprecision(2) << minimum_total_cost << endl;
+
+    return 0;
+}

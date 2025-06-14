@@ -1,0 +1,60 @@
+#include <iostream>   // For input/output operations (cin, cout)
+#include <vector>     // For std::vector
+#include <algorithm>  // For std::max
+#include <climits>    // For INT_MIN
+
+int main() {
+    // Optimize C++ standard streams for competitive programming.
+    // This unties cin from cout and prevents synchronization with C's stdio.
+    std::cin.tie(nullptr)->sync_with_stdio(false);
+
+    int num_patterns;
+    std::cin >> num_patterns; // Read the number of patterns/rows to process
+
+    // 'max_row_index' keeps track of the maximum row index that has been modified.
+    // This is used to determine how many rows to print at the end.
+    int max_row_index = INT_MIN;
+
+    // 'pattern_grid' is a 2D vector (grid) representing the patterns.
+    // It's initialized with 'o' characters.
+    // 'n' (num_patterns) determines the number of rows initially,
+    // and 70 is a fixed width for each row.
+    std::vector<std::vector<char>> pattern_grid(num_patterns, std::vector<char>(70, 'o'));
+
+    // Loop through each input pattern description.
+    for (int i = 0; i < num_patterns; ++i) {
+        int row_idx, start_col_idx, length;
+        std::cin >> row_idx >> start_col_idx >> length; // Read pattern details
+
+        // Adjust to 0-based indexing for row and column.
+        row_idx--;
+        start_col_idx--;
+
+        // Update the maximum row index encountered.
+        max_row_index = std::max(max_row_index, row_idx);
+
+        // Mark 'x' characters in the pattern_grid based on the input.
+        // 'length' specifies how many 'x's to place starting from 'start_col_idx'.
+        while (length--) {
+            // Ensure we don't write beyond the fixed width of the grid (70 columns).
+            if (start_col_idx < 70) {
+                pattern_grid[row_idx][start_col_idx] = 'x';
+                start_col_idx++; // Move to the next column for the next 'x'
+            } else {
+                break; // Stop if we exceed the grid width
+            }
+        }
+    }
+
+    // Print the modified pattern grid.
+    // Only print rows up to and including 'max_row_index'.
+    for (int i = 0; i <= max_row_index; ++i) {
+        // Iterate through each character in the current row and print it.
+        for (char cell_char : pattern_grid[i]) {
+            std::cout << cell_char;
+        }
+        std::cout << "\n"; // Move to the next line after printing a row.
+    }
+
+    return 0; // Indicate successful execution
+}

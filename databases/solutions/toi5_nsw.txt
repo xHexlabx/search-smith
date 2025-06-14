@@ -1,0 +1,31 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int k1,k2,k3,n;
+string key,str;
+
+int n2en(int i,int k) {
+    int ans = (i-1+k)%9;
+    if (ans == 0) ans = 9;
+    return ans;
+}
+
+int main() {
+    cin.tie(nullptr)->sync_with_stdio(false);
+    cin >> key >> str;
+    k1 = key[0]-'0';
+    k2 = key[1]-'0';
+    k3 = key[2]-'0';
+    for (auto c : str) {
+        n = c-'0';
+        int d = n2en(n2en(n2en(n,k1),k2),k3);
+        k1 = n2en(k1+1,key[0]-'0');
+        k3 = n2en(k3+1,key[2]-'0');
+        if (k2-1 == 0) k2 = 9;
+        else k2--;
+        
+        cout << d;
+    }
+    
+    return 0;
+}  

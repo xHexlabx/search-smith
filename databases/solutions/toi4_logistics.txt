@@ -1,0 +1,77 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+#define ll long long
+#define fr(i, a, b, c) for (int i = a; i < b; i += c)
+#define fre(i, a, b, c) for (int i = a; i >= b; i -= c)
+#define MAXN 1e9 + 5
+
+using pii = pair<int, int>;
+using tiii = tuple<int, int, int>;
+
+map<char, map<char, vector<int>>> adjacency_list;
+map<char, bool> visited_nodes;
+vector<tuple<char, char, float>> results;
+
+void calculate_median_and_traverse(char start_node) {
+    queue<char> nodes_queue;
+    nodes_queue.push(start_node);
+    float total_median_sum = 0.0;
+
+    while (!nodes_queue.empty()) {
+        char current_node = nodes_queue.front();
+        nodes_queue.pop();
+
+        visited_nodes[current_node] = true;
+
+        for (auto const& [neighbor_node, distances] : adjacency_list[current_node]) {
+            if (!visited_nodes[neighbor_node]) {
+                vector<int> sorted_distances = distances;
+                sort(sorted_distances.begin(), sorted_distances.end());
+
+                float median_value;
+                if (sorted_distances.size() % 2 == 0) {
+                    median_value = (float)(sorted_distances[sorted_distances.size() / 2 - 1] + sorted_distances[sorted_distances.size() / 2]) / 2.0;
+                } else {
+                    median_value = sorted_distances[sorted_distances.size() / 2];
+                }
+                total_median_sum += median_value;
+                results.push_back(make_tuple(current_node, neighbor_node, median_value));
+                nodes_queue.push(neighbor_node);
+            }
+        }
+    }
+
+    if (!visited_nodes['Y']) {
+        cout << "broken" << endl;
+        return;
+    }
+
+    for (const auto& result_entry : results) {
+        cout << get<0>(result_entry) << " " << get<1>(result_entry) << " " << setprecision(1) << fixed << get<2>(result_entry) << endl;
+    }
+    cout << setprecision(1) << fixed << total_median_sum << endl;
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+
+    int num_edges;
+    cin >> num_edges;
+
+    fr(i, 0, num_edges, 1) {
+        char node_u, node_v;
+        cin >> node_u >> node_v;
+        int distance_val;
+        cin >> distance_val;
+        adjacency_list[node_u][node_v].push_back(distance_val);
+        adjacency_list[node_v][node_u].push_back(distance_val);
+    }
+
+    calculate_median_and_traverse('X');
+
+    return 0;
+}

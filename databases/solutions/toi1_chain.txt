@@ -1,0 +1,54 @@
+#include <iostream> // For standard input/output operations (cin, cout)
+#include <vector>   // For std::vector
+#include <string>   // For std::string
+
+bool areStringsChainCompatible(const std::string& str1, const std::string& str2, int length) {
+    int differing_char_count = 0;
+    for (int i = 0; i < length; ++i) {
+        if (str1[i] != str2[i]) {
+            differing_char_count++;
+        }
+    }
+
+    // A chain is formed if there are less than 3 differing characters.
+    return differing_char_count < 3;
+}
+
+int main() {
+    // Optimize C++ standard streams for faster input/output.
+    // This is a common competitive programming optimization.
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+
+    int string_length; // Denotes L: the length of each string.
+    int num_strings;   // Denotes N: the total number of strings.
+    std::cin >> string_length >> num_strings;
+
+    // Store all input strings in a vector.
+    std::vector<std::string> all_input_strings(num_strings);
+    for (int i = 0; i < num_strings; ++i) {
+        std::cin >> all_input_strings[i];
+    }
+
+    // Initialize the 'last valid string in a chain' to the last string provided.
+    // This variable will hold the answer.
+    std::string final_answer_string = all_input_strings[num_strings - 1];
+
+    // Iterate through the strings from the first to the second-to-last,
+    // checking if each pair forms a valid chain.
+    for (int i = 0; i < num_strings - 1; ++i) {
+        // If the current string and the next string are NOT chain compatible,
+        // it means the chain breaks at 'inputs[i]'.
+        // In this case, 'inputs[i]' is the last string that completes a valid chain
+        // segment starting from the beginning.
+        if (!areStringsChainCompatible(all_input_strings[i], all_input_strings[i + 1], string_length)) {
+            final_answer_string = all_input_strings[i];
+            break; // The chain is broken, so we found our answer and can stop.
+        }
+    }
+
+    // Output the determined answer string.
+    std::cout << final_answer_string << '\n';
+
+    return 0; // Indicate successful program execution.
+}

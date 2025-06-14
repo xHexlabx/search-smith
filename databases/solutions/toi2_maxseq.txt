@@ -1,0 +1,71 @@
+#include <iostream>
+#include <vector>
+#include <numeric> // For std::accumulate if needed, though not directly used in the refactored code
+
+// The overall idea of this code is to find the maximum sum subarray (Kadane's algorithm)
+// and also to store the elements of that maximum sum subarray.
+
+// Global variables are often avoided in competitive programming for larger projects,
+// but can be acceptable for small, self-contained problems to save time.
+// For better practice, these could be encapsulated within a class or passed as arguments.
+std::vector<int> arr;            // Stores the input array elements
+long long current_sum = 0;       // Accumulates the sum of the current subarray
+long long max_so_far = 0;        // Stores the maximum sum found so far
+
+// Variables to keep track of the elements in the current and maximum sum subarrays
+std::vector<int> current_subarray_elements; // Stores elements of the current subarray
+std::vector<int> max_subarray_elements;     // Stores elements of the maximum sum subarray found
+
+void process_element(int element_value) {
+    // Add the current element to the current sum
+    current_sum += element_value;
+    // Add the current element to the list of elements in the current subarray
+    current_subarray_elements.push_back(element_value);
+
+    // If the current sum is greater than the maximum sum found so far,
+    // update the maximum sum and store the current subarray's elements.
+    if (current_sum > max_so_far) {
+        max_so_far = current_sum;
+        max_subarray_elements = current_subarray_elements; // Copy the elements
+    }
+    // If the current sum becomes non-positive, it means starting a new subarray
+    // from the next element would yield a greater or equal sum.
+    // So, reset the current sum and clear the current subarray elements.
+    else if (current_sum <= 0) {
+        current_sum = 0;
+        current_subarray_elements.clear();
+    }
+}
+
+int main() {
+    std::ios_base::sync_with_stdio(false); // Optimize I/O for competitive programming
+    std::cin.tie(NULL);                   // Untie cin from cout
+
+    int n; // Number of elements in the array
+    std::cin >> n;
+
+    arr.resize(n); // Resize the input array to hold 'n' elements
+
+    // Process each element of the input array
+    for (int i = 0; i < n; ++i) {
+        std::cin >> arr[i]; // Read the element
+        process_element(arr[i]); // Call the function to process the element
+    }
+
+    // If the maximum sum found is 0, it implies all numbers were negative
+    // or the array was empty (though 'n' is usually positive in competitive programming).
+    // In this specific problem, if max_so_far is 0, it means no positive sum subarray was found.
+    if (max_so_far == 0) {
+        std::cout << "Empty sequence\n";
+    } else {
+        // Print the elements of the maximum sum subarray
+        for (size_t i = 0; i < max_subarray_elements.size(); ++i) {
+            std::cout << max_subarray_elements[i] << (i == max_subarray_elements.size() - 1 ? "" : " ");
+        }
+        std::cout << "\n";
+        // Print the maximum sum
+        std::cout << max_so_far << "\n";
+    }
+
+    return 0;
+}
