@@ -69,7 +69,7 @@ if __name__ == "__main__":
         print(f"⚠️ Warning: Directory not found: '{DOCUMENTS_DIR}'.")
         sys.exit(1)
 
-    for filename in os.listdir(DOCUMENTS_DIR):
+    for filename in os.listdir(DOCUMENTS_DIR)[50:60]:
         # Now looks for .txt files instead of .md
         if filename.endswith(".txt"):
             file_path = os.path.join(DOCUMENTS_DIR, filename)
