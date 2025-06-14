@@ -11,3 +11,5 @@ instructions/
 
 models/
 search_smith.egg-info/
+
+.DS_Store
