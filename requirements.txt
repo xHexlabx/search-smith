@@ -30,3 +30,5 @@ bitsandbytes
 python-dotenv
 # A utility for creating progress bars
 tqdm
+# Markdown
+markdown
