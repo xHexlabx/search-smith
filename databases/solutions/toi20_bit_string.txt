@@ -1,0 +1,108 @@
+#include <iostream>     // For standard input/output operations (cin, cout)
+#include <vector>       // For dynamic arrays (std::vector)
+#include <string>       // For std::string
+#include <limits>       // For std::numeric_limits
+
+// Function to convert a binary string to an integer bitmask.
+// Example: "101" -> 5 (binary 101)
+int convertBinaryStringToMask(const std::string& binary_string) {
+    int mask = 0;
+    // Iterate through each character of the string
+    for (char digit_char : binary_string) {
+        // Shift the current mask to the left by 1 (make space for new bit)
+        mask = (mask << 1);
+        // If the character is '1', set the least significant bit
+        if (digit_char == '1') {
+            mask |= 1; // Same as mask = mask | 1
+        }
+        // Alternatively, using (c - '0') directly:
+        // mask = (mask << 1) | (digit_char - '0');
+    }
+    return mask;
+}
+
+int main() {
+    // Optimize C++ standard streams for competitive programming.
+    // This unties cin/cout from C's stdio and speeds up I/O.
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(nullptr); // Disables synchronization with cout, further speeding up cin.
+
+    int num_elements; // Represents 'N' - the number of bits in the mask (or elements)
+    int num_queries;  // Represents 'Q' - the number of queries to perform
+
+    std::cin >> num_elements >> num_queries;
+
+    // Calculate the total number of possible masks (2^N)
+    int total_masks = 1 << num_elements;
+
+    // Define a constant for negative infinity to represent unreachable or invalid states in DP.
+    // Using `std::numeric_limits<int>::min()` is safer than an arbitrary large negative number.
+    const int NEGATIVE_INFINITY = std::numeric_limits<int>::min();
+
+    // dp[mask] will store the maximum value obtainable for the subset represented by 'mask'.
+    // Initialize all DP states to NEGATIVE_INFINITY.
+    std::vector<int> dp_max_values(total_masks, NEGATIVE_INFINITY);
+
+    // Read initial values for each mask (corresponding to a binary string input).
+    // These are the base cases for the dynamic programming.
+    std::string binary_str;
+    int initial_weight;
+    for (int i = 0; i < total_masks; ++i) {
+        std::cin >> binary_str >> initial_weight;
+        // Convert the binary string to its integer mask representation
+        dp_max_values[convertBinaryStringToMask(binary_str)] = initial_weight;
+    }
+
+    // Dynamic Programming Calculation:
+    // Iterate through all possible masks from 1 up to (total_masks - 1).
+    // Mask 0 (empty set) is typically a base case and doesn't involve transitions from other masks.
+    for (int current_mask = 1; current_mask < total_masks; ++current_mask) {
+        int max_prev_value = NEGATIVE_INFINITY;
+
+        // Transition 1: Consider removing a single '1' bit from the current_mask.
+        // This corresponds to a subproblem where one element is excluded.
+        for (int i = 0; i < num_elements; ++i) {
+            // Check if the i-th bit is set in the current_mask
+            if (current_mask & (1 << i)) {
+                // If set, consider the subproblem formed by flipping/removing this bit.
+                // current_mask ^ (1 << i) effectively unsets the i-th bit.
+                max_prev_value = std::max(max_prev_value, dp_max_values[current_mask ^ (1 << i)]);
+            }
+        }
+
+        // Transition 2: Consider removing a pair of adjacent '1' bits from the current_mask.
+        // This corresponds to a subproblem where two adjacent elements are excluded.
+        // The loop goes up to N-1 because we need two bits (i and i+1).
+        for (int i = 0; i < num_elements - 1; ++i) {
+            // Check if both the i-th and (i+1)-th bits are set.
+            // (current_mask >> i & 3) checks if the last two bits (00, 01, 10, 11)
+            // starting from position 'i' are '11' (binary 3).
+            if (((current_mask >> i) & 3) == 3) {
+                // If both are set, consider the subproblem formed by flipping/removing these two bits.
+                // current_mask ^ (3 << i) effectively unsets bits 'i' and 'i+1'.
+                max_prev_value = std::max(max_prev_value, dp_max_values[current_mask ^ (3 << i)]);
+            }
+        }
+
+        // Update the DP value for current_mask.
+        // If a valid previous state was found (not NEGATIVE_INFINITY),
+        // add the current mask's initial weight to the best previous value.
+        // Otherwise, if no valid previous state could lead to this mask, it remains unreachable.
+        if (max_prev_value != NEGATIVE_INFINITY) {
+            dp_max_values[current_mask] += max_prev_value;
+        } else {
+            // If no valid previous state, this mask's DP value remains unreachable.
+            dp_max_values[current_mask] = NEGATIVE_INFINITY;
+        }
+    }
+
+    // Process queries: For each query, convert the binary string to a mask
+    // and output the precomputed DP value.
+    while (num_queries--) {
+        std::cin >> binary_str;
+        int query_mask = convertBinaryStringToMask(binary_str);
+        std::cout << dp_max_values[query_mask] << '\n';
+    }
+
+    return 0; // Indicate successful program execution
+}

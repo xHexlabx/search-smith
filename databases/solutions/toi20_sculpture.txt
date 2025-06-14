@@ -1,0 +1,147 @@
+#include <iostream>   // For std::cin, std::cout
+#include <vector>     // For std::vector
+#include <algorithm>  // For std::min, std::max, std::pair
+#include <limits>     // For std::numeric_limits<long long>::max()
+
+// Using a more descriptive alias for long long
+using ll = long long;
+
+int main() {
+    // Optimize C++ standard streams for competitive programming.
+    // Unties cin/cout from C's stdio and speeds up I/O by preventing synchronization.
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(0);
+
+    int n; // Number of elements
+    std::cin >> n;
+
+    // 'items' stores pairs of (first_value, second_value) for each item.
+    // The problem context implies these could be 'weight' and 'limit' or similar.
+    std::vector<std::pair<ll, ll>> items(n);
+    for (int i = 0; i < n; ++i) {
+        std::cin >> items[i].first >> items[i].second;
+    }
+
+    // --- DP Pass 1: Forward DP ---
+    // This DP aims to find properties of prefixes of the array.
+    // `dp_prefix[current_row_idx][j]` stores a minimum sum/value for a segment ending at index `j`.
+    // `count_prefix_segments[j]` stores the maximum number of segments for a prefix ending at `j`.
+    // The `i&1` trick is used for space optimization (only need previous row's DP values).
+    std::vector<std::vector<ll>> dp_prefix(2, std::vector<ll>(n));
+    std::vector<ll> count_prefix_segments(n);
+
+    // Initialize base case for DP_prefix (first row, representing 1 segment).
+    for (int j = 0; j < n; ++j) {
+        dp_prefix[0][j] = items[j].first; // Current item's first value
+        count_prefix_segments[j] = 1;      // One segment so far
+
+        // Maintain minimum prefix sum/value up to `j` (for a single segment).
+        if (j > 0) {
+            dp_prefix[0][j] = std::min(dp_prefix[0][j], dp_prefix[0][j - 1]);
+        }
+    }
+
+    // Iterate for increasing number of segments 'k' (from 1 to n-1).
+    // `k` here represents (number of segments - 1).
+    for (int k = 1; k < n; ++k) {
+        // Initialize current DP row with a very large value (infinity).
+        for (int j = 0; j < n; ++j) {
+            dp_prefix[k & 1][j] = std::numeric_limits<ll>::max();
+        }
+
+        // Iterate through possible ending positions 'j' for the current prefix DP state.
+        for (int j = 1; j < n; ++j) {
+            // Transition: If the previous segment's accumulated value (`dp_prefix[!(k&1)][j-1]`)
+            // satisfies a condition related to the current item's 'second_value'.
+            // This suggests extending a `k-1` segment solution to a `k` segment solution.
+            if (dp_prefix[!(k & 1)][j - 1] <= items[j].second) {
+                // Update current DP state: accumulate value and update segment count.
+                dp_prefix[k & 1][j] = dp_prefix[!(k & 1)][j - 1] + items[j].first;
+                count_prefix_segments[j] = k + 1; // k is 0-indexed, so k+1 segments
+            }
+            // Maintain minimum prefix sum/value up to `j` for `k` segments.
+            // This ensures `dp_prefix[k&1][j]` stores the best value ending at `j` with `k` segments.
+            dp_prefix[k & 1][j] = std::min(dp_prefix[k & 1][j], dp_prefix[k & 1][j - 1]);
+        }
+    }
+
+    // --- DP Pass 2: Backward DP ---
+    // This DP aims to find properties of suffixes of the array.
+    // `dp_suffix[current_row_idx][j]` stores a maximum sum/value for a segment starting at index `j`.
+    // `count_suffix_segments[j]` stores the maximum number of segments for a suffix starting at `j`.
+    std::vector<std::vector<ll>> dp_suffix(2, std::vector<ll>(n));
+    std::vector<ll> count_suffix_segments(n);
+
+    // Initialize base case for DP_suffix (first row, representing 1 segment).
+    for (int j = n - 1; j >= 0; --j) {
+        dp_suffix[0][j] = items[j].second; // Current item's second value
+        count_suffix_segments[j] = 1;       // One segment so far
+
+        // Maintain maximum suffix value up to `j` (for a single segment).
+        if (j < n - 1) {
+            dp_suffix[0][j] = std::max(dp_suffix[0][j], dp_suffix[0][j + 1]);
+        }
+    }
+
+    // Iterate for increasing number of segments 'k' (from 1 to n-1).
+    for (int k = 1; k < n; ++k) {
+        // Initialize current DP row with a very small value (infinity).
+        for (int j = 0; j < n; ++j) {
+            dp_suffix[k & 1][j] = 0; // Or std::numeric_limits<ll>::min() if sums can be negative
+        }
+
+        // Iterate through possible starting positions 'j' for the current suffix DP state.
+        for (int j = n - 2; j >= 0; --j) {
+            // Transition: If the next segment's accumulated value (`dp_suffix[!(k&1)][j+1]`)
+            // satisfies a condition related to the current item's 'first_value'.
+            // This suggests extending a `k-1` segment solution to a `k` segment solution.
+            if (dp_suffix[!(k & 1)][j + 1] >= items[j].first) {
+                // Update current DP state: calculate new value and update segment count.
+                dp_suffix[k & 1][j] = std::min(dp_suffix[!(k & 1)][j + 1] - items[j].first, items[j].second);
+                count_suffix_segments[j] = k + 1;
+            }
+            // Maintain maximum suffix value from `j` for `k` segments.
+            dp_suffix[k & 1][j] = std::max(dp_suffix[k & 1][j], dp_suffix[k & 1][j + 1]);
+        }
+    }
+
+    // Final Post-processing for `count_suffix_segments`:
+    // Ensure that `count_suffix_segments[i]` stores the maximum segment count
+    // for any suffix starting from index `i` *or beyond*. This is a suffix maximum.
+    for (int i = n - 2; i >= 0; --i) {
+        count_suffix_segments[i] = std::max(count_suffix_segments[i], count_suffix_segments[i + 1]);
+    }
+
+    // --- Combine DP results to find the overall optimal solution ---
+    // Iterate through all possible split points `i` (between `i` and `i+1`).
+    // The goal is to maximize the sum of segments from a prefix ending at `i`
+    // and a suffix starting at `i+1`.
+    int max_total_segments = 0;
+    std::vector<int> optimal_split_points; // Stores 1-based indices of optimal split points
+
+    for (int i = 0; i < n - 1; ++i) {
+        // Calculate the total number of segments if the split is after index `i`.
+        // This combines `count_prefix_segments[i]` (for elements `0` to `i`)
+        // and `count_suffix_segments[i+1]` (for elements `i+1` to `n-1`).
+        ll current_total_segments = count_prefix_segments[i] + count_suffix_segments[i + 1];
+
+        // Update maximum total segments found.
+        if (current_total_segments > max_total_segments) {
+            max_total_segments = current_total_segments;
+            optimal_split_points.clear();      // Clear previous optimal splits
+            optimal_split_points.push_back(i + 1); // Add current split point (1-based index)
+        } else if (current_total_segments == max_total_segments) {
+            optimal_split_points.push_back(i + 1); // Add current split point if it also achieves max
+        }
+    }
+
+    // Output the maximum total number of segments.
+    std::cout << max_total_segments << '\n';
+    // Output the 1-based indices of all optimal split points.
+    for (const auto& split_point_idx : optimal_split_points) {
+        std::cout << split_point_idx << ' ';
+    }
+    std::cout << '\n';
+
+    return 0; // Indicate successful program execution
+}

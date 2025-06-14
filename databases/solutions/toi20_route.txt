@@ -1,0 +1,31 @@
+#include <bits/stdc++.h>
+
+#include "route.h" 
+
+
+std::vector<std::pair<int,int>> route(int N, std::vector<int> W){
+
+   std::vector<std::pair<int,int>> edge;
+
+   int cur = W.size()-N+1;
+
+   for(int i = 2; i <= N; i++){
+
+      edge.push_back({1,i});
+
+      for(int j = 2; j < i; j++){
+
+         if(cur == 0) break;
+
+         edge.push_back({j,i});
+
+         cur--;
+
+      }
+
+   }
+
+   return edge;
+
+}
+
