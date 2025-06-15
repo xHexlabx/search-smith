@@ -11,7 +11,7 @@ __version__ = "0.1.0"
 
 from . import config
 from .llm_handler import get_gemini_llm ,get_huggingface_llm, load_prompt_template 
-from .document_processor import tag_documents
+from .document_processor import create_langchain_json , tag_documents
 
 # You can define what `from search_smith import *` will import
 __all__ = [
@@ -19,6 +19,7 @@ __all__ = [
     "get_gemini_llm",
     "get_huggingface_llm",
     "load_prompt_template",
-    "tag_documents",
+    "create_langchain_json",
+    "tag_documents"
 ]
 

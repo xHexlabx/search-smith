@@ -10,7 +10,7 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, project_root)
 
 # Import from your new, modularized package
-from search_smith import config, get_gemini_llm ,get_huggingface_llm , load_prompt_template, tag_documents  # noqa: E402
+from search_smith import config, get_gemini_llm ,get_huggingface_llm , load_prompt_template, tag_documents , create_langchain_json  # noqa: E402
 
 def main():
     """
@@ -37,8 +37,16 @@ def main():
     chain = prompt_template | llm | StrOutputParser()
 
     # 4. Process documents using the dedicated processor function
-    tag_documents(
-        directory=config.SOLUTIONS_DIR,
+    # tag_documents(
+    #     directory=config.SOLUTIONS_DIR,
+    #     chain=chain,
+    #     file_limit=None  # Example: limit processing to 10 files
+    # )
+
+    create_langchain_json(
+        problems_dir=config.PROBLEMS_DIR,
+        solutions_dir=config.SOLUTIONS_DIR,
+        output_path=config.JSON_OUTPUT_DIR,
         chain=chain,
         file_limit=None  # Example: limit processing to 10 files
     )
