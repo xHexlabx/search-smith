@@ -22,6 +22,4 @@ GEMINI_MODEL_NAME = "gemini-2.0-flash"  # Changed to a common, stable version
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
 
-# --- Vector Store Settings ---
-SIMILARITY_SEARCH_K = 3 # Number of results to return from similarity search
 
