@@ -1,95 +1,46 @@
-# search_smith/documents_handler.py
-
-import os
+# scripts/documents_setup.py
 import sys
+import os
 from dotenv import load_dotenv
-# CHANGED: Swapped Markdown loader for the generic Text loader
-from langchain_community.document_loaders import TextLoader
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
-# --- Constants ---
-# Assumes the script is run from the project's root directory
-PROMPT_FILE_PATH = "prompts/tagger.txt"
-DOCUMENTS_DIR = "databases/solutions"
-# NEW: Define the Gemini model to use
-GEMINI_MODEL_NAME = "gemini-2.0-flash"
+# This is a common pattern to make the search_smith package importable
+# when running scripts from the 'scripts' directory.
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, project_root)
 
-if __name__ == "__main__":
+# Import from your new, modularized package
+from search_smith import config, get_gemini_llm, load_prompt_template, tag_documents  # noqa: E402
+
+def main():
+    """
+    Main function to run the document tagging process.
+    """
     # Load environment variables from .env file (for GOOGLE_API_KEY)
     load_dotenv()
+    
+    print("🚀 Starting document setup...")
 
-    print("🚀 Starting document setup with Gemini API...")
+    # 1. Initialize the Language Model from the handler
+    llm = get_gemini_llm(
+        model_name=config.GEMINI_MODEL_NAME
+    )
 
-    # 2. Set up the Language Model (Gemini API)
-    llm = None  # Initialize to None to handle potential errors
-    try:
-        # Check if the API key is available
-        if not os.getenv("GOOGLE_API_KEY"):
-            print("❌ Error: GOOGLE_API_KEY not found in environment variables.")
-            print("   Please create a .env file and add your GOOGLE_API_KEY.")
-            sys.exit(1)  # Exit the script if the key is missing
+    # 2. Load the prompt template from the handler
+    prompt_template = load_prompt_template(
+        prompt_file_path=config.PROMPT_FILE_PATH
+    )
 
-        print(f"✅ Initializing Gemini model: {GEMINI_MODEL_NAME}")
-
-        # Instantiate the Gemini model with specific parameters
-        llm = ChatGoogleGenerativeAI(
-            model=GEMINI_MODEL_NAME,
-            temperature=0.2,
-            max_output_tokens=1000,  # Note: equivalent to max_new_tokens
-        )
-
-        print("✅ Gemini model initialized successfully.")
-    except Exception as e:
-        print(f"❌ Failed to initialize Gemini API: {e}")
-        sys.exit(1)
-
-    # 3. Load the Prompt Template from file
-    prompt_template = None # Initialize to None
-    try:
-        with open(PROMPT_FILE_PATH, "r", encoding="utf-8") as f:
-            prompt_template_string = f.read()
-        prompt_template = ChatPromptTemplate.from_template(prompt_template_string)
-        print(f"✅ Prompt template loaded from '{PROMPT_FILE_PATH}'.")
-    except FileNotFoundError:
-        print(f"❌ Error: Prompt file not found at '{PROMPT_FILE_PATH}'.")
-        sys.exit(1)
-    except Exception as e:
-        print(f"❌ An error occurred while loading the prompt: {e}")
-        sys.exit(1)
-
-
-    # 4. Create the LangChain Chain (LCEL)
+    # 3. Create the LangChain Chain (LCEL)
     chain = prompt_template | llm | StrOutputParser()
 
-    # 5. Process Each Text Document
-    print(f"\n🔎 Processing text documents in '{DOCUMENTS_DIR}'...")
-    if not os.path.exists(DOCUMENTS_DIR):
-        print(f"⚠️ Warning: Directory not found: '{DOCUMENTS_DIR}'.")
-        sys.exit(1)
+    # 4. Process documents using the dedicated processor function
+    tag_documents(
+        directory=config.SOLUTIONS_DIR,
+        chain=chain,
+        file_limit=10  # Example: limit processing to 10 files
+    )
 
-    for filename in os.listdir(DOCUMENTS_DIR)[50:60]:
-        # Now looks for .txt files instead of .md
-        if filename.endswith(".txt"):
-            file_path = os.path.join(DOCUMENTS_DIR, filename)
-            try:
-                # Using TextLoader for .txt files with UTF-8 encoding.
-                loader = TextLoader(file_path, encoding="utf-8")
-                docs = loader.load()
+if __name__ == "__main__":
+    main()
 
-                if not docs:
-                    print(f"    ⚠️ Could not extract content from '{filename}'. Skipping.")
-                    continue
-
-                content = docs[0].page_content
-                # FIXED: Changed the key to 'question_markdown' to match the
-                # variable expected by your prompt template.
-                tags = chain.invoke({"question_markdown": content})
-
-                print(f"🏷️  {filename}: {tags.strip()}")
-
-            except Exception as e:
-                print(f"    ❌ Error processing file {filename}: {e}")
-
-    print("\n✅ Document tagging process complete.")
