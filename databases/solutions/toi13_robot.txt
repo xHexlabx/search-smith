@@ -1,32 +1,111 @@
-#include<bits/stdc++.h>
-#define endll '\n'
-#define vec vector
-#define umap unordered_map
-#define ll unsigned long long 
+#include <bits/stdc++.h>
+
+#define pii pair<int,int>
+
 using namespace std;
-ll arr[20000001];
-int main(){
-	
-	ll n ; scanf("%lld" , &n);
-	for(ll i = 0 ; i < n ; i ++)scanf("%lld" , &arr[i]) ;
-	ll l = 0 , r = 1e10 , mid; 
-	bool can ; deque<ll>dq ;
-	
-	while(l < r){
-		dq.clear();
-		mid = (l + r) >> 1 ;
-		for(int i = 0 ; i < n ; i ++ ){
-			if(arr[i] > mid){
-				if(dq.empty())dq.push_back(arr[i]);
-				else {
-					if(dq.back() == arr[i])dq.pop_back();
-					else  break;
-				}
-			}
-		}
-		if(dq.empty())r = mid ;
-		else l = mid  + 1; 
-	}
-	printf("%lld" , l) ;
-	return 0;
+
+int dx[] = {-1,0,1,0};
+
+int dy[] = {0,-1,0,1};
+
+
+int main() {
+
+    int n;
+
+    int m;
+
+
+    cin >> n >> m;
+
+    vector<vector<char>>grid(n,vector<char>(m));
+
+    vector<vector<int>>d(n,vector<int>(m,1e9));
+
+    vector<pii>obj;
+
+    queue<pii>q;
+
+    
+
+    for (int i=0; i<n; i++) {
+
+        for (int j=0; j<m; j++) {
+
+            cin >> grid[i][j];
+
+            
+
+            if (grid[i][j] == 'X') {
+
+                q.push({j,i});
+
+                d[i][j] = 0;
+
+            }
+
+            else if (grid[i][j] == 'A') {
+
+                obj.push_back({j,i});
+
+            }
+
+        }
+
+    }
+
+
+    while (!q.empty()) {
+
+        int x,y;
+
+        tie(x,y) = q.front();
+
+        q.pop();
+
+
+        for (int i=0; i<4; i++) {
+
+            int nx = x + dx[i];
+
+            int ny = y + dy[i];
+
+            
+
+            if (nx < 0 || ny < 0 || nx >= m || ny >= n) continue;
+
+            if (grid[ny][nx] == 'X' || grid[ny][nx] == 'W') continue;
+
+            if (d[ny][nx] > d[y][x]+1) {
+
+                q.push({nx,ny});
+
+                d[ny][nx] = d[y][x]+1;
+
+            }
+
+        }
+
+    }
+
+
+    int ans = 0;
+
+    int cnt = 0;
+
+
+    for (auto &o : obj) {
+
+        if (d[o.second][o.first] != 1e9) {
+
+            ++cnt;
+
+            ans+=2*(d[o.second][o.first]);
+
+        }
+
+    }
+
+    cout << cnt << " " << ans;
+
 }

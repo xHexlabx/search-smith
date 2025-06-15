@@ -1,89 +1,22 @@
-#include <bits/stdc++.h>
-
-using namespace std;
-
-using ll = long long;
-
-
-const int M = 1e7+10;
-
-int n,m,q,a,t[15],bro[15],stu[M],mxti[15];
-
-vector<int> sum;
-
-
-int main() { 
-
-    cin.tie(nullptr)->sync_with_stdio(false);
-
-    cin >> n >> m >> q;
-
-    for (int i = 1; i <= n; i++) cin >> t[i];
-
-    for (int i = 1; i <= n; i++) cin >> bro[i];
-
-    for (int i = 1; i <= m; i++) {cin >> stu[i]; stu[i] += stu[i-1];}
-
-    for (int i = 1; i <= q; i++) cin >> mxti[i];
-
-    sort(t+1,t+1+n);
-
-    for (int i = 1; i <= q; i++) {
-
-        sum.clear();
-
-        bool ch = false;
-
-        int old = 0;
-
-        for (int j = 1; j <= n; j++) {
-
-            cin >> a;
-
-            if (old == 0) {old = a; continue;}
-
-            sum.push_back(stu[a-1]-stu[old-1]);
-
-            old = a;
-
-        }
-
-        sum.push_back(stu[m]-stu[old-1]);
-
-        sort(sum.begin(),sum.end());
-
-        do {
-
-            ch = true;
-
-            for (int j = 1; j <= n; j++) {
-
-                int w = t[j]-bro[j];
-
-                int ti = sum[j-1]/w;
-
-                if (sum[j-1]%w) ti++;
-
-                //cout << ti << " " << mxti[i] << "\n";
-
-                if (ti > mxti[i]) {
-
-                    ch = false;
-
-                    break;
-
-                }
-
-            }
-
-            if (ch) break;
-
-        } while (next_permutation(bro+1,bro+1+n));
-
-        cout << ((ch) ? "P" : "F") << "\n";
-
+#include<bits/stdc++.h> 
+using namespace std ;
+map<vector<pair<int,int>> , int>mpp ;
+vector<pair<int,int>> blockchain(){
+    
+    int x , y , sz ; cin >> sz ;
+    vector<pair<int,int>>vec ;
+    for(int i = 0 ; i < sz - 1; i ++ ){
+        cin >> x >> y ;
+        vec.push_back({min(x , y) , max(x , y)});
     }
-
-    return 0;
-
+    sort(vec.begin(),vec.end());
+    return vec ;
+}
+int main (){
+    ios_base :: sync_with_stdio(0),cin.tie(0);
+    
+    int n , q ; cin >> n >> q ;
+    while(n -- )mpp[blockchain()]++ ;
+    while(q -- )cout << mpp[blockchain()] << '\n';
+    return 0 ;
 }

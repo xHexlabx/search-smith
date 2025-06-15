@@ -1,32 +1,39 @@
-#include<bits/stdc++.h>
-#define endll '\n'
-#define vec vector
-#define umap unordered_map
-#define ll unsigned long long 
+#include <bits/stdc++.h>
+
 using namespace std;
-ll arr[20000001];
+
+int lis(int *arr,int n){
+
+    if(!n) return 0;
+
+    vector<int> val;
+
+    for(int i=0; i<n; i++){
+
+        auto idx=upper_bound(val.begin(),val.end(),arr[i])-val.begin();
+
+        if(idx>=(int)val.size()) val.push_back(arr[i]);
+
+        else val[idx]=arr[i];
+
+    }
+
+    return val.size();
+
+}
+
 int main(){
-	
-	ll n ; scanf("%lld" , &n);
-	for(ll i = 0 ; i < n ; i ++)scanf("%lld" , &arr[i]) ;
-	ll l = 0 , r = 1e10 , mid; 
-	bool can ; deque<ll>dq ;
-	
-	while(l < r){
-		dq.clear();
-		mid = (l + r) >> 1 ;
-		for(int i = 0 ; i < n ; i ++ ){
-			if(arr[i] > mid){
-				if(dq.empty())dq.push_back(arr[i]);
-				else {
-					if(dq.back() == arr[i])dq.pop_back();
-					else  break;
-				}
-			}
-		}
-		if(dq.empty())r = mid ;
-		else l = mid  + 1; 
-	}
-	printf("%lld" , l) ;
-	return 0;
+
+    int n;
+
+    cin >> n;
+
+    int arr[n];
+
+    for(int i=0; i<n; i++) cin >> arr[i];
+
+    cout << n-lis(arr,n);
+
+    return 0;
+
 }

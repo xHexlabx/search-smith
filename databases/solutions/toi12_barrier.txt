@@ -1,46 +1,37 @@
 #include<bits/stdc++.h>
-using namespace std ;
-bitset<2001>visited[2001] ;
-struct coor {
-    int x , y ;
-};
-int m , n , cnt = 0 ;
-bool is_valid(int x , int y) { 
-    if(x < 0 || x >= m || y < 0 || y >= n)return false;
-    return true ;
-}
+using namespace std;
+int arr[6000001] , MAX = 0 , range = 0 , n , k , sum ;
+deque<int>dq ;
 int main(){
-    ios_base :: sync_with_stdio(0) , cin.tie(0);
-    cin >> m >> n ;
-    for(int i = 0 ; i < m ; i ++ )cin >> visited[i] ;
-    
-    for(int i = 0 ; i < m ; i ++ ){
-        for(int j = 0 ; j < n ; j ++ ){
-            if(visited[i][j]){
+    ios_base :: sync_with_stdio(0) , cin.tie(0) ;
+    cin >> n >> k ;
+    for(int i = 1 ; i <= n ; i ++) {
+        cin >> arr[i] ;
+        arr[i] += arr[i - 1];
+    }
+    for(int i = 1 ; i <= n ; i ++ ){
+        if(i == 1){
+            if(arr[i] > MAX){
+                MAX = arr[i] ;
+                range = 1 ;
                 
-                cnt ++ ;
-                visited[i][j] = 0 ;
-                queue<coor>q ;
-                q.push({i , j});
-                while(!q.empty()){
-                    
-                    auto temp = q.front();
-                    q.pop() ;
-                    for(int x = -1 ; x <= 1 ; x ++  ){
-                        for(int y = -1 ; y <= 1 ; y ++ ){
-                            int nowx = temp.x + x , nowy = temp.y + y ;
-                            if(is_valid(nowx , nowy)){
-                                if(visited[nowx][nowy]){
-                                    visited[nowx][nowy] = 0 ;
-                                    q.push({nowx , nowy}) ;
-                                }
-                            }
-                        }
-                    }
-                }
             }
+            dq.push_back(1) ;
+        }
+        else {
+            while(!dq.empty() && i - dq.front() > k)dq.pop_front() ;
+            sum = arr[i] - arr[dq.front()] ;
+            if(sum > MAX){
+                MAX = sum;
+                range = i - dq.front() ;
+            }
+            else if(sum == MAX){
+                range = min(range , i - dq.front());
+            }
+            while(!dq.empty() && arr[dq.back()] > arr[i])dq.pop_back() ; 
+            dq.push_back(i);
         }
     }
-    cout << cnt ;
+    cout << MAX << '\n' << range ;
     return 0 ;
 }
