@@ -40,7 +40,7 @@ def main():
     tag_documents(
         directory=config.SOLUTIONS_DIR,
         chain=chain,
-        file_limit=20  # Example: limit processing to 10 files
+        file_limit=None  # Example: limit processing to 10 files
     )
 
 if __name__ == "__main__":

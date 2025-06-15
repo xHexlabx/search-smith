@@ -58,11 +58,11 @@ def get_huggingface_llm(model_name: str, temperature: float = 0.2, max_tokens: i
         print("   Please create a .env file and add your HF_TOKEN.")
         sys.exit(1)
 
-    print(f"✅ Initializing Gemini model: {model_name}")
+    print(f"✅ Initializing Hugging face model: {model_name}")
     try:
         HF_TOKEN = os.getenv("HF_TOKEN")
         login(token=HF_TOKEN)
-        
+
         llm = HuggingFaceEndpoint(
             repo_id=model_name,
             task="text-generation",
