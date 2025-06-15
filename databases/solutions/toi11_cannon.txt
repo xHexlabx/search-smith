@@ -1,72 +1,46 @@
 #include<bits/stdc++.h>
-
-using namespace std;
-
-
-int n,k,prev1,prev2,curr,pre=-69;
-
-vector<int> v,tmp;
-
-signed main() {
-
-	cin.tie(0)->sync_with_stdio(0);
-
-	cin>>n>>k;
-
-	cin>>prev2>>prev1;
-
-	if (prev2>prev1) v.push_back(prev2);
-
-	for (int i=0;i<n-2;i++) {
-
-		cin>>curr;
-
-		if (prev1>prev2&&prev1>curr) v.push_back(prev1);
-
-		prev2=prev1;
-
-		prev1=curr;
-
-	}
-
-	if (prev1>prev2) v.push_back(prev1);
-
-	sort(v.begin(),v.end());
-
-	for (auto&x:v) {
-
-		if (x==pre) continue;
-
-		pre=x;
-
-		tmp.push_back(x);
-
-	}
-
-	if (tmp.size()==0) {
-
-		cout<<-1;
-
-	}
-
-	else if (tmp.size()<k) {
-
-		for (auto&x:tmp) cout<<x<<'\n';
-
-	}
-
-	else {
-
-		int i=tmp.size()-1;
-
-		while(k--) {
-
-			cout<<tmp[i--]<<'\n';
-
-		}
-
-	}
-
-	return 0;
-
+using namespace std ;
+bitset<2001>visited[2001] ;
+struct coor {
+    int x , y ;
+};
+int m , n , cnt = 0 ;
+bool is_valid(int x , int y) { 
+    if(x < 0 || x >= m || y < 0 || y >= n)return false;
+    return true ;
+}
+int main(){
+    ios_base :: sync_with_stdio(0) , cin.tie(0);
+    cin >> m >> n ;
+    for(int i = 0 ; i < m ; i ++ )cin >> visited[i] ;
+    
+    for(int i = 0 ; i < m ; i ++ ){
+        for(int j = 0 ; j < n ; j ++ ){
+            if(visited[i][j]){
+                
+                cnt ++ ;
+                visited[i][j] = 0 ;
+                queue<coor>q ;
+                q.push({i , j});
+                while(!q.empty()){
+                    
+                    auto temp = q.front();
+                    q.pop() ;
+                    for(int x = -1 ; x <= 1 ; x ++  ){
+                        for(int y = -1 ; y <= 1 ; y ++ ){
+                            int nowx = temp.x + x , nowy = temp.y + y ;
+                            if(is_valid(nowx , nowy)){
+                                if(visited[nowx][nowy]){
+                                    visited[nowx][nowy] = 0 ;
+                                    q.push({nowx , nowy}) ;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    cout << cnt ;
+    return 0 ;
 }
