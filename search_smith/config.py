@@ -17,7 +17,7 @@ PROMPT_FILE_PATH = PROMPTS_DIR / "tagger.txt"
 
 # --- LLM and Embedding Model Settings ---
 GEMINI_MODEL_NAME = "gemini-2.0-flash"  # Changed to a common, stable version
-
+HF_MODEL_NAME = "meta-llama/Llama-3.1-8B-Instruct"
 # --- Text Splitter Settings ---
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200

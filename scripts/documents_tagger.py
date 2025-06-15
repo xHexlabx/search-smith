@@ -10,7 +10,7 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, project_root)
 
 # Import from your new, modularized package
-from search_smith import config, get_gemini_llm, load_prompt_template, tag_documents  # noqa: E402
+from search_smith import config, get_gemini_llm ,get_huggingface_llm , load_prompt_template, tag_documents  # noqa: E402
 
 def main():
     """
@@ -22,10 +22,12 @@ def main():
     print("🚀 Starting document setup...")
 
     # 1. Initialize the Language Model from the handler
-    llm = get_gemini_llm(
-        model_name=config.GEMINI_MODEL_NAME
+    # llm = get_gemini_llm(
+    #     model_name=config.GEMINI_MODEL_NAME
+    # )
+    llm = get_huggingface_llm(
+        model_name=config.HF_MODEL_NAME
     )
-
     # 2. Load the prompt template from the handler
     prompt_template = load_prompt_template(
         prompt_file_path=config.PROMPT_FILE_PATH
@@ -38,7 +40,7 @@ def main():
     tag_documents(
         directory=config.SOLUTIONS_DIR,
         chain=chain,
-        file_limit=10  # Example: limit processing to 10 files
+        file_limit=20  # Example: limit processing to 10 files
     )
 
 if __name__ == "__main__":

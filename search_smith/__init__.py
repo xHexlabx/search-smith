@@ -10,13 +10,14 @@ __version__ = "0.1.0"
 # This allows imports like `from search_smith import load_text_documents`.
 
 from . import config
-from .llm_handler import get_gemini_llm, load_prompt_template
+from .llm_handler import get_gemini_llm ,get_huggingface_llm, load_prompt_template 
 from .document_processor import tag_documents
 
 # You can define what `from search_smith import *` will import
 __all__ = [
     "config",
     "get_gemini_llm",
+    "get_huggingface_llm",
     "load_prompt_template",
     "tag_documents",
 ]
