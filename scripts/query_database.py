@@ -3,7 +3,6 @@ import os
 import sys
 from dotenv import load_dotenv
 from langchain_community.vectorstores import Chroma
-# !ปรับปรุง: ใช้ import จากแพ็กเกจใหม่
 from langchain_huggingface import HuggingFaceEmbeddings
 
 def recommend_problems(retriever, query: str):
@@ -11,7 +10,6 @@ def recommend_problems(retriever, query: str):
     ฟังก์ชันสำหรับรับคำค้นหาและแสดงโจทย์ที่เกี่ยวข้อง
     """
     print(f"\n🔎 กำลังค้นหาโจทย์สำหรับ query: '{query}'")
-    
     relevant_docs = retriever.invoke(query)
     
     if not relevant_docs:
@@ -22,13 +20,12 @@ def recommend_problems(retriever, query: str):
     for i, doc in enumerate(relevant_docs):
         problem_name = doc.metadata.get('problem_name', 'N/A')
         tags = doc.metadata.get('tags', 'N/A')
-        
         full_content = doc.page_content
         display_content = full_content.split("\n---\n", 1)[1] if "\n---\n" in full_content else full_content
         
         print(f"--- ข้อที่ {i+1}: {problem_name} ---")
         print(f"  Tags: {tags}")
-        #print(f"  เนื้อหา: {display_content.strip()[:200]}...")
+        print(f"  เนื้อหา: {display_content.strip()[:200]}...")
         print("-" * (len(problem_name) + 12))
 
 def main():
@@ -38,20 +35,20 @@ def main():
     # --- 1. การตั้งค่าและโหลด Database ---
     load_dotenv()
     
-    # !ปรับปรุง: ใช้ Path ของฐานข้อมูลที่สร้างจาก Local Model ใหม่
-    VECTOR_STORE_PATH = "databases/chroma_db_problems_local_mpnet"
+    # !ปรับปรุง: ใช้ Path ของฐานข้อมูลที่สร้างจากโมเดล Qwen
+    VECTOR_STORE_PATH = "databases/chroma_db_problems_qwen"
     
     if not os.path.exists(VECTOR_STORE_PATH):
         print(f"❌ ไม่พบฐานข้อมูลที่ '{VECTOR_STORE_PATH}'")
         print("กรุณารันไฟล์ 'create_database.py' ก่อนเพื่อสร้างฐานข้อมูล")
         return
 
-    print("กำลังโหลด Vector Store และ Local Embedding Model...")
+    print("กำลังโหลด Vector Store และ Local Embedding Model (Qwen)...")
     try:
-        # !ปรับปรุง: ใช้โค้ดที่คุณให้มาเพื่อโหลดโมเดลตัวเดียวกัน
-        model_name = "sentence-transformers/all-mpnet-base-v2"
+        # !ปรับปรุง: ใช้โมเดล Qwen ตัวเดียวกัน
+        model_name = "Qwen/Qwen3-Embedding-0.6B"
         model_kwargs = {'device': 'cpu'}
-        encode_kwargs = {'normalize_embeddings': False}
+        encode_kwargs = {'normalize_embeddings': True}
         
         embeddings = HuggingFaceEmbeddings(
             model_name=model_name,
