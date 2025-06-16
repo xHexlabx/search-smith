@@ -1,22 +1,40 @@
-# --- Core libraries for LangChain ---
-# Used for document loading, text splitting, chains, and prompts
+# --- Core LangChain Framework ---
+# Essential packages for the LangChain library
 langchain
-langchain-community
 langchain-core
+langchain-community
 
-# --- LLM and Vector DB Integrations ---
-# NEW: For the Gemini API integration via LangChain (used in documents_handler.py)
+# --- Vector Database ---
+# For creating and managing the local vector store
+chromadb
+
+# --- LLM & Embedding Integrations ---
+# For using the Gemini API (e.g., in the tagging script)
 langchain-google-genai
+google-generativeai
+
+# For using local and API-based models from Hugging Face
 langchain-huggingface
 
-# --- Google Generative AI SDK ---
-# Direct SDK, often a peer dependency for LangChain integrations
-google-generativeai
+# --- Model & ML Libraries ---
+# The core library for running local sentence embedding models
+sentence-transformers
+
+# The main machine learning framework, required by sentence-transformers
+torch
+
+# A core library from Hugging Face, a dependency for many models like Qwen
+transformers
+
+# A dependency for specific models like Qwen
+einops
 
 # --- Utilities ---
 # For loading environment variables (like API keys) from a .env file
 python-dotenv
-# A utility for creating progress bars
+
+# For creating progress bars, useful for long-running scripts
 tqdm
-# Markdown
+
+# For handling Markdown formatted text if needed
 markdown
