@@ -6,7 +6,7 @@ Search Smith คือเครื่องมือค้นหาอัจฉ�
 
 1.  **Clone a repository:**
     ```bash
-    git clone <URL ของ repository>
+    https://github.com/xHexlabx/search-smith.git
     cd search-smith
     ```
 2.  **สร้างและ Activate Virtual Environment:**
