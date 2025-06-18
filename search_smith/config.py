@@ -2,27 +2,17 @@
 from pathlib import Path
 
 # --- Project Root ---
-# This helps in creating absolute paths, making the project more robust.
 PROJECT_ROOT = Path(__file__).parent.parent
 
 # --- Directory Paths ---
-# All paths are now relative to the project root.
-PROMPTS_DIR = PROJECT_ROOT / "prompts"
 DATABASES_DIR = PROJECT_ROOT / "databases"
-PROBLEMS_DIR = DATABASES_DIR / "texts"
-SOLUTIONS_DIR = DATABASES_DIR / "solutions"
-VECTOR_STORE_DIR = DATABASES_DIR / "chroma_db" 
-JSON_OUTPUT_DIR = DATABASES_DIR / "documents" / "documents.json"
-# --- File Paths ---
-PROMPT_FILE_PATH = PROMPTS_DIR / "tagger.txt"
+DOCUMENTS_JSON_PATH = DATABASES_DIR / "documents" / "documents.json"
+VECTOR_STORE_PATH = DATABASES_DIR / "chroma_db_problems_qwen"
 
-# --- LLM and Embedding Model Settings ---
-GEMINI_MODEL_NAME = "gemini-2.0-flash"  # Changed to a common, stable version
-HF_MODEL_NAME = "meta-llama/Llama-3.3-70B-Instruct"
-# HF_MODEL_NAME = "Qwen/Qwen3-8B"
+# --- Embedding Model Settings ---
+EMBEDDING_MODEL_NAME = "Qwen/Qwen3-Embedding-0.6B"
+EMBEDDING_MODEL_KWARGS = {'device': 'cpu'}
+EMBEDDING_ENCODE_KWARGS = {'normalize_embeddings': True}
 
-# --- Text Splitter Settings ---
-CHUNK_SIZE = 1000
-CHUNK_OVERLAP = 200
-
-
+# --- Retriever Settings ---
+SEARCH_KWARGS = {"k": 5}
