@@ -5,7 +5,11 @@ from pathlib import Path
 from langchain_core.runnables import Runnable
 from langchain_community.document_loaders import TextLoader
 
-def tag_documents(directory: Path, chain: Runnable, file_limit: int = None):
+def tag_documents(
+    directory: Path, 
+    chain: Runnable, 
+    file_limit: int = None
+):
     """
     Processes each text document in a directory, applies a LangChain chain
     to tag it, and prints the results.
@@ -70,7 +74,7 @@ def create_langchain_json(
     """
     print(f"\n🔎 Processing documents from '{problems_dir}' and '{solutions_dir}'...")
     if not problems_dir.is_dir() or not solutions_dir.is_dir():
-        print(f"⚠️ Error: One or more directories not found.")
+        print("⚠️ Error: One or more directories not found.")
         return
 
     # Get a list of all .md problem files
