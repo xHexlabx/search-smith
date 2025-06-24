@@ -9,8 +9,8 @@ def parse_requirements(filename='requirements.txt'):
 setup(
     name='search-smith',
     version='0.1.0',
-    author='Your Name', # <--- เปลี่ยนเป็นชื่อของคุณ
-    author_email='your.email@example.com', # <--- เปลี่ยนเป็นอีเมลของคุณ
+    author='Tee Hemjinda',
+    author_email='tee.hemjinda.work@gmail.com',
     description='A smart search tool for PDFs using vector similarity search.',
 
     # find_packages() จะค้นหาทุกแพ็กเกจในโปรเจกต์อัตโนมัติ (ในที่นี้คือโฟลเดอร์ search-smith)
